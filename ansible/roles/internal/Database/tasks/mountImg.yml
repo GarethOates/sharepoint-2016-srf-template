@@ -27,24 +27,18 @@
   tags:
   - all-environments
 
-# since we are using Ansible 2.4, change this to the built-in module
-- name: Add SPOSCAR\SP_FARM to Local Admins Group
-  script: ../../common/files/AddDomainAccountToAdminsGroup.ps1 -domain_username SPOSCAR\SP_FARM -domain_username_password pass@word1!
-  tags:
-  - all-environments
-
-- name: Add SPOSCAR\administrator to Local Admins Group
-  script: ../../common/files/AddDomainAccountToAdminsGroup.ps1 -domain_username SPOSCAR\Administrator  -domain_username_password pass@word1!
-  tags:
-  - all-environments
- 
-- name: Add SPOSCAR\vagrant to SysAdmin SQL Role (return 0 = success)
-  win_shell: sqlcmd -S SP2016SQLSERVER -Q "EXEC sp_addsrvrolemember 'SPOSCAR\vagrant', 'sysadmin';"
-  tags:
-  - all-environments
+- name: Add Domain Users to Local Admins Group
+  win_group_membership:
+    name: Administrators
+    members:
+      - SPOSCAR\SP_FARM
+      - SPOSCAR\administrator
+    state: present
+  register: domainusers
 
 - name: Reboot Server so UAC changes take effect.
-  win_reboot: 
+  win_reboot:
+  when: domainusers.changed
 
 - name: Download SQL Server ISO to root C:\
   win_get_url:
@@ -83,5 +77,7 @@
   tags:
   - vagrant-environment
 
-  
-
+# - name: Add SPOSCAR\vagrant to SysAdmin SQL Role (return 0 = success)
+#   win_shell: sqlcmd -S SP2016SQLSERVER -U {{domain_admin_user}} -P {{domain_admin_password}} -Q "EXEC sp_addsrvrolemember 'SPOSCAR\vagrant', 'sysadmin';"
+#   tags:
+#   - all-environments

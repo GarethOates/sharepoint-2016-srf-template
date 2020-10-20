@@ -4,8 +4,8 @@ network: "10.0.2.15"
 netbios: "SPOSCAR"
 
 dns_server: "192.168.2.19"
-domain_admin_user: packer@sposcar.local
-domain_admin_password: pass@word1!
+domain_admin_user: vagrant@sposcar.local
+domain_admin_password: Pass@word1!
 
 ansible_user: vagrant
 ansible_password: vagrant

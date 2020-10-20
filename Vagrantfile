@@ -41,7 +41,7 @@ Vagrant.configure(2) do |config|
   config.vm.box_check_update = false
 
   machines.each do |machine|
-   
+
     name = machine[1]['name']
     box =  machine[1]['box']
     role = machine[1]['role']
@@ -73,7 +73,7 @@ Vagrant.configure(2) do |config|
     cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
     cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
-    
+
       if box
         cfg.vm.box = box
       elsif box_url && box_name
@@ -95,9 +95,6 @@ Vagrant.configure(2) do |config|
         end
       end
 
-      # disable UAC for all boxes - this will be done using Packer, for now do it here.
-      cfg.vm.provision "shell", path: "./ansible/roles/internal/common/files/provision_settings.ps1"
-
       # Use specific Ansible Playbooks and other provisioners based on SP Machine Role
       if role == 'DomainController'
         cfg.vm.provision :ansible do |ansible|
@@ -111,8 +108,8 @@ Vagrant.configure(2) do |config|
             # we need the following line to ensure ansible does not fail
             # when bringing up the vagrant domain vs an aws hosted one.  cloud_host variable must be defined
             # basically
-            ansible.extra_vars = { 
-              "cloud_host" => "DomainControllers" 
+            ansible.extra_vars = {
+              "cloud_host" => "DomainControllers"
             }
             ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
            end
@@ -121,7 +118,7 @@ Vagrant.configure(2) do |config|
           spec.pattern = 'spec/SP2012R2AD.sposcar.local/ad_spec.rb'
         end
       elsif role == 'Front-End'
-       # we must set the network interface DNS server accordingly
+        # we must set the network interface DNS server accordingly
         # before we join the machien to the domain
         config.vm.provision "shell", path: "./ansible/roles/internal/DomainController/files/SetDNS.ps1", args:"-DNS 192.168.2.19 -Network 192.168.2.16"
 
@@ -130,36 +127,36 @@ Vagrant.configure(2) do |config|
           ansible.playbook = "ansible/plays/webservers.yml"
           ansible.inventory_path = "ansible/hosts_dev_env.yaml"
           ansible.verbose = "vvvv"
-          ansible.extra_vars = { 
+          ansible.extra_vars = {
             "cloud_host" => "Webservers"
           }
           ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
         end
       elsif role == 'Database'
-        
-       # we must set the network interface DNS server accordingly
+
+        # we must set the network interface DNS server accordingly
         # before we join the machien to the domain
         config.vm.provision "shell", path: "./ansible/roles/internal/DomainController/files/SetDNS.ps1", args:"-DNS 192.168.2.19 -Network 192.168.2.17"
 
         cfg.vm.provision :ansible do |ansible|
           ansible.limit = "Databases"
-          ansible.playbook = "ansible/plays/databaseservers.yml" 
+          ansible.playbook = "ansible/plays/databaseservers.yml"
           ansible.inventory_path = "ansible/hosts_dev_env.yaml"
           ansible.verbose = "vvvvv"
-          ansible.extra_vars = { 
+          ansible.extra_vars = {
             "cloud_host" => "Databases"
           }
           ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
         end
       elsif role == 'Application'
-       
+
         # we must set the network interface DNS server accordingly
          # before we join the machien to the domain
          config.vm.provision "shell", path: "./ansible/roles/internal/DomainController/files/SetDNS.ps1", args:"-DNS 192.168.2.19 -Network 192.168.2.18"
- 
+
          cfg.vm.provision :ansible do |ansible|
            ansible.limit = "AppServers"
-           ansible.playbook = "ansible/plays/appservers.yml" 
+           ansible.playbook = "ansible/plays/appservers.yml"
            ansible.inventory_path = "ansible/hosts_dev_env.yaml"
            ansible.verbose = "vvvv"
            ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
