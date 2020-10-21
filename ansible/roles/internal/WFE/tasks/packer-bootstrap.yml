@@ -56,16 +56,25 @@
   win_copy:
     src: ../../common/files/Install-Prerequisites.ps1
     dest: C:\SP\Install-Prerequisites.ps1
-    force: false
+    force: no
   tags:
     - never
 
-- name: Copy SP Bits in {{ disk_image_out.mount_path }} to SPAutoInstaller folder structure
-  win_shell: XCOPY {{ disk_image_out.mount_path }}\* C:\SP\2016\SharePoint\ /s /i /Y
-  args:
-  executable: cmd
+- name: Copy SP Bits to SPAutoInstaller folder structure
+  win_copy:
+    src: "{{ disk_image_out.mount_path}}\\*"
+    dest: C:\SP\2016\SharePoint\
+    force: yes
+    remote_src: yes
   tags:
     - never
+
+# - name: "Copy SP Bits to SPAutoInstaller folder structure"
+#   win_shell: XCOPY "{{ disk_image_out.mount_path }}\* C:\SP\2016\SharePoint\ /s /i /Y"
+#   args:
+#   executable: cmd
+#   tags:
+#     - never
 
 - name: Download SharePoint Prerequisites
   win_shell: C:\SP\DownloadPrerequisites.ps1 -SPPrerequisitesPath c:\SP\2016\prerequisiteinstallerfiles

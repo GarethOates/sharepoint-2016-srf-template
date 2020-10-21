@@ -21,17 +21,23 @@
     path: C:\SP
     state: directory
 
-
 - name: Copy SP folder (SPAutoInstaller folder structure)
   win_copy:
-    src: ../../common/files/SP/
-    dest: C:\SP
-    force: false
+    src: '../../common/files/SP/'
+    dest: 'C:\SP'
+    force: no
 
-- name: Copy SP Bits in {{ disk_image_out.mount_path }} to SPAutoInstaller folder structure
-  win_shell: XCOPY {{ disk_image_out.mount_path }}\* C:\SP\2016\SharePoint\ /s /i /Y
-  args:
-  executable: cmd
+- name: Copy SP Bits to SPAutoInstaller folder structure
+  win_copy:
+    src: "{{ disk_image_out.mount_path}}"
+    dest: C:\SP\2016\SharePoint\
+    force: yes
+    remote_src: yes
+
+# - name: Copy SP Bits to SPAutoInstaller folder structure
+#   win_shell: 'XCOPY {{ disk_image_out.mount_path }}\* C:\SP\2016\SharePoint\ /s /i /Y'
+#   args:
+#   executable: cmd
 
 - name: Install All Required Windows Features
   win_feature:
@@ -43,12 +49,12 @@
   register: feature_result
 
 # make sure to put the prerequisites in the proper folder.
-- name: Download SharePoint Prerequisites 
+- name: Download SharePoint Prerequisites
   script: ../../common/files/DownloadPrerequisites.ps1 -SPPrerequisitesPath {{SharePointPrerequisitesPath}}
 
 - name: Install SharePoint Prerequisites via PowerShell
   script: ../../common/files/Install-Prerequisites.ps1 -SharePointBitsPath {{SharePointBitsPath}}
-  
+
 - name: Reboot after Installing Prerequisites
   win_reboot:
 

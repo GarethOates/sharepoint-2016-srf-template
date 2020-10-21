@@ -33,7 +33,7 @@
     dest: C:\SP
     force: false
 
-- name: Copy SP Bits in {{ disk_image_out.mount_path }} to SPAutoInstaller folder structure
+- name: "Copy SP Bits in {{ disk_image_out.mount_path }} to SPAutoInstaller folder structure"
   win_shell: XCOPY {{ disk_image_out.mount_path }}\* C:\SP\2016\SharePoint\ /s /i /Y
   args:
   executable: cmd
@@ -52,7 +52,7 @@
     include_management_tools: yes
 
 # make sure to put the prerequisites in the proper folder.
-- name: Download SharePoint Prerequisites 
+- name: Download SharePoint Prerequisites
   script: ../../common/files/DownloadPrerequisites.ps1 -SPPrerequisitesPath {{SharePointPrerequisitesPath}}
 
 - name: Install SharePoint Prerequisites via PowerShell
