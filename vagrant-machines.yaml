@@ -11,7 +11,7 @@ DomainControllers:
 Webservers:
   name: WFE1
   box: garethoates/spfarm_base_windows2016
-  hostname: sp2016WFE
+  hostname: SP2016WFE
   role: Front-End
   memory: 2048
   default: false
@@ -31,7 +31,7 @@ Databases:
 AppServers:
   name: AppServer1
   box: garethoates/spfarm_base_windows2016
-  hostname: sp2016AppServer
+  hostname: SP2016APPSERVER
   role: Application
   memory: 4048
   default: false

@@ -35,9 +35,7 @@ File.open("ansible/hosts_dev_env.yaml" ,'w') do |f|
   end
 end
 
-
 Vagrant.configure(2) do |config|
-
   config.vm.box_check_update = false
 
   machines.each do |machine|
@@ -55,24 +53,24 @@ Vagrant.configure(2) do |config|
     # insert the private key from the host machine to the guest
     ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=~/.vagrant.d/insecure_private_key"
 
-
     fail error.new, 'machines must contain a name' if name.nil?
 
     config.vm.define name, primary: default, autostart: default do |cfg|
-    cfg.vm.hostname = hostname
-        # credentials
-    cfg.winrm.username = "vagrant"
-    cfg.winrm.password = "vagrant"
-    cfg.vm.guest = :windows
-    cfg.vm.communicator = "winrm"
-    cfg.windows.halt_timeout = 35
-    cfg.vm.boot_timeout = 800
+      cfg.vm.hostname = hostname
 
-    #configure the network for this machine
-    cfg.vm.network "private_network", ip: ip_address
-    cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
-    cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
-    cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
+      # credentials
+      cfg.winrm.username = "vagrant"
+      cfg.winrm.password = "vagrant"
+      cfg.vm.guest = :windows
+      cfg.vm.communicator = "winrm"
+      cfg.windows.halt_timeout = 35
+      cfg.vm.boot_timeout = 800
+
+      #configure the network for this machine
+      cfg.vm.network "private_network", ip: ip_address
+      cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
+      cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
+      cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
 
       if box
         cfg.vm.box = box
@@ -85,7 +83,7 @@ Vagrant.configure(2) do |config|
 
       if providers == 'virtualbox'
         cfg.vm.provider :virtualbox do |v|
-          v.gui = true
+          v.gui = false
           v.customize ["modifyvm", :id, "--memory", memory]
           v.customize ["modifyvm", :id, "--cpus", 2]
           v.customize ["modifyvm", :id, "--vram", 128]
@@ -95,8 +93,11 @@ Vagrant.configure(2) do |config|
         end
       end
 
-      # Use specific Ansible Playbooks and other provisioners based on SP Machine Role
+        # Use specific Ansible Playbooks and other provisioners based on SP Machine Role
       if role == 'DomainController'
+        cfg.winrm.username = "vagrant@sposcar.local"
+        cfg.winrm.password = "Pass@word1!"
+
         cfg.vm.provision :ansible do |ansible|
             #let's configure the domain controler and add
             # a) the SP Service Accounts
@@ -104,7 +105,7 @@ Vagrant.configure(2) do |config|
             ansible.limit = "DomainControllers"
             ansible.playbook = "ansible/plays/domaincontroller.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-            ansible.verbose = "vvvv"
+
             # we need the following line to ensure ansible does not fail
             # when bringing up the vagrant domain vs an aws hosted one.  cloud_host variable must be defined
             # basically
@@ -112,7 +113,7 @@ Vagrant.configure(2) do |config|
               "cloud_host" => "DomainControllers"
             }
             ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-           end
+          end
         # Run ServerSpec Tests for Domain Controller
         cfg.vm.provision :serverspec do |spec|
           spec.pattern = 'spec/SP2012R2AD.sposcar.local/ad_spec.rb'
@@ -126,14 +127,12 @@ Vagrant.configure(2) do |config|
           ansible.limit = "Webservers"
           ansible.playbook = "ansible/plays/webservers.yml"
           ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-          ansible.verbose = "vvvv"
           ansible.extra_vars = {
             "cloud_host" => "Webservers"
           }
           ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
         end
       elsif role == 'Database'
-
         # we must set the network interface DNS server accordingly
         # before we join the machien to the domain
         config.vm.provision "shell", path: "./ansible/roles/internal/DomainController/files/SetDNS.ps1", args:"-DNS 192.168.2.19 -Network 192.168.2.17"
@@ -149,18 +148,16 @@ Vagrant.configure(2) do |config|
           ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
         end
       elsif role == 'Application'
-
         # we must set the network interface DNS server accordingly
-         # before we join the machien to the domain
-         config.vm.provision "shell", path: "./ansible/roles/internal/DomainController/files/SetDNS.ps1", args:"-DNS 192.168.2.19 -Network 192.168.2.18"
+        # before we join the machien to the domain
+        config.vm.provision "shell", path: "./ansible/roles/internal/DomainController/files/SetDNS.ps1", args:"-DNS 192.168.2.19 -Network 192.168.2.18"
 
-         cfg.vm.provision :ansible do |ansible|
-           ansible.limit = "AppServers"
-           ansible.playbook = "ansible/plays/appservers.yml"
-           ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-           ansible.verbose = "vvvv"
-           ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-         end
+        cfg.vm.provision :ansible do |ansible|
+          ansible.limit = "AppServers"
+          ansible.playbook = "ansible/plays/appservers.yml"
+          ansible.inventory_path = "ansible/hosts_dev_env.yaml"
+          ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+        end
       end
     end
   end

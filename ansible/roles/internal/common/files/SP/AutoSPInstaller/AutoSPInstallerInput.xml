@@ -59,7 +59,7 @@
         <ServerRoles>
             <Custom Provision="false"/>
             <WebFrontEnd Provision="false"/>
-            <WebFrontEndWithDistributedCache Provision="SP2016WFE"/>
+            <WebFrontEndWithDistributedCache Provision="SP2016WFE1"/>
             <SingleServerFarm Provision="false"/>
             <Search Provision="false"/>
             <Application Provision="false"/>

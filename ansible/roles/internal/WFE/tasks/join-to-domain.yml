@@ -6,7 +6,7 @@
 - name: Join Webserver to Domain Controller
   win_domain_membership:
       dns_domain_name: "{{domain}}"
-      hostname: "{{cloud_host}}"
+      hostname: "SP2016WFE1"
       domain_admin_user: "{{domain_admin_user}}"
       domain_admin_password: "{{domain_admin_password}}"
       state: domain
