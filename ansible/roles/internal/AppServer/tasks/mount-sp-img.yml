@@ -120,7 +120,7 @@
 # Pause for 5 minutes to build app cache.
 - name: Wait for SPAutoInstaller to Finish first pass
   pause:
-    minutes: 15
+    minutes: 30
 
 - name: Reboot server for AutoSPInstaller to continue
   win_reboot:
