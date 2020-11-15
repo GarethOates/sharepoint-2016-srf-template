@@ -1,6 +1,7 @@
 - name: Install PSExec
   win_chocolatey:
     name: psexec
+    ignore_checksums: yes
   ignore_errors: yes
 
 - name: Download SharePoint 2016
@@ -33,10 +34,12 @@
     dest: C:\SP
     force: false
 
-- name: "Copy SP Bits in {{ disk_image_out.mount_path }} to SPAutoInstaller folder structure"
-  win_shell: XCOPY {{ disk_image_out.mount_path }}\* C:\SP\2016\SharePoint\ /s /i /Y
-  args:
-  executable: cmd
+- name: Copy SP Bits to SPAutoInstaller folder structure
+  win_copy:
+    src: "{{ disk_image_out.mount_path}}"
+    dest: C:\SP\2016\SharePoint\
+    force: yes
+    remote_src: yes
 
 # - name: Unmount SharePoint Bits .img
 #   win_disk_image:
@@ -45,11 +48,54 @@
 
 - name: Install All Required Windows Features
   win_feature:
-    name: NET-HTTP-Activation,NET-Non-HTTP-Activ,NET-WCF-Pipe-Activation45,NET-WCF-HTTP-Activation45,Web-Server,Web-WebServer,Web-Common-Http,Web-Static-Content,Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-App-Dev,Web-Asp-Net,Web-Asp-Net45,Web-Net-Ext,Web-Net-Ext45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Health,Web-Http-Logging,Web-Log-Libraries,Web-Request-Monitor,Web-Http-Tracing,Web-Security,Web-Basic-Auth,Web-Windows-Auth,Web-Filtering,Web-Digest-Auth,Web-Performance,Web-Stat-Compression,Web-Dyn-Compression,Web-Mgmt-Tools,Web-Mgmt-Console,Web-Mgmt-Compat,Web-Metabase,WAS,WAS-Process-Model,WAS-NET-Environment,WAS-Config-APIs,Web-Lgcy-Scripting,Windows-Identity-Foundation,Xps-Viewer
+    name: "{{ item }}"
     state: present
     restart: yes
     include_sub_features: yes
     include_management_tools: yes
+  with_items:
+    - NET-HTTP-Activation
+    - NET-Non-HTTP-Activ
+    - NET-WCF-Pipe-Activation45
+    - NET-WCF-HTTP-Activation45
+    - Web-Server
+    - Web-WebServer
+    - Web-Common-Http
+    - Web-Static-Content
+    - Web-Default-Doc
+    - Web-Dir-Browsing
+    - Web-Http-Errors
+    - Web-App-Dev
+    - Web-Asp-Net
+    - Web-Asp-Net45
+    - Web-Net-Ext
+    - Web-Net-Ext45
+    - Web-ISAPI-Ext
+    - Web-ISAPI-Filter
+    - Web-Health
+    - Web-Http-Logging
+    - Web-Log-Libraries
+    - Web-Request-Monitor
+    - Web-Http-Tracing
+    - Web-Security
+    - Web-Basic-Auth
+    - Web-Windows-Auth
+    - Web-Filtering
+    - Web-Digest-Auth
+    - Web-Performance
+    - Web-Stat-Compression
+    - Web-Dyn-Compression
+    - Web-Mgmt-Tools
+    - Web-Mgmt-Console
+    - Web-Mgmt-Compat
+    - Web-Metabase
+    - WAS
+    - WAS-Process-Model
+    - WAS-NET-Environment
+    - WAS-Config-APIs
+    - Web-Lgcy-Scripting
+    - Windows-Identity-Foundation
+    - Xps-Viewer
 
 # make sure to put the prerequisites in the proper folder.
 - name: Download SharePoint Prerequisites
@@ -74,11 +120,10 @@
 # Pause for 5 minutes to build app cache.
 - name: Wait for SPAutoInstaller to Finish first pass
   pause:
-    minutes: 5
+    minutes: 15
 
 - name: Reboot server for AutoSPInstaller to continue
   win_reboot:
-
 
 - name: wait until admin port 2016 is available. start checking after 15 minutes.
   win_wait_for:

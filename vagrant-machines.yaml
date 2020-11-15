@@ -33,7 +33,7 @@ AppServers:
   box: garethoates/spfarm_base_windows2016
   hostname: SP2016APPSERVER
   role: Application
-  memory: 4048
+  memory: 2048
   default: false
   ip_address: 192.168.2.18
   providers: virtualbox
