@@ -105,13 +105,6 @@ Vagrant.configure(2) do |config|
             ansible.limit = "DomainControllers"
             ansible.playbook = "ansible/plays/domaincontroller.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-
-            # we need the following line to ensure ansible does not fail
-            # when bringing up the vagrant domain vs an aws hosted one.  cloud_host variable must be defined
-            # basically
-            ansible.extra_vars = {
-              "cloud_host" => "DomainControllers"
-            }
             ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
           end
         # Run ServerSpec Tests for Domain Controller
@@ -127,9 +120,6 @@ Vagrant.configure(2) do |config|
           ansible.limit = "Webservers"
           ansible.playbook = "ansible/plays/webservers.yml"
           ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-          ansible.extra_vars = {
-            "cloud_host" => "Webservers"
-          }
           ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
         end
       elsif role == 'Database'
@@ -141,10 +131,6 @@ Vagrant.configure(2) do |config|
           ansible.limit = "Databases"
           ansible.playbook = "ansible/plays/databaseservers.yml"
           ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-          ansible.verbose = "vvvvv"
-          ansible.extra_vars = {
-            "cloud_host" => "Databases"
-          }
           ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
         end
       elsif role == 'Application'

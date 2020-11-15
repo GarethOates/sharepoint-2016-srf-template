@@ -1,6 +1,6 @@
 ---
 - name: appservers.yml | All roles
-  hosts: "{{cloud_host|default('AppServers')}}"
+  hosts: AppServers
 
   roles:
   #- { role: common,         tags: ["common"] }

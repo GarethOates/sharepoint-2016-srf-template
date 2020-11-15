@@ -23,6 +23,3 @@ ansible_winrm_server_cert_validation: ignore
 #SharePoint related global variables
 SharePointBitsPath: "c:\\SP\\2016\\SharePoint"
 SharePointPrerequisitesPath: "c:\\SP\\2016\\prerequisiteinstallerfiles"
-
-
-cloud_host: null

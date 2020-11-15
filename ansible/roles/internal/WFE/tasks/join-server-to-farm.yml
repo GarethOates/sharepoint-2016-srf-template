@@ -21,7 +21,7 @@
 - name: wait 300 seconds for port 2016 to become open on the host, don't start checking for 60 seconds
   win_wait_for:
     port: 2016
-    host: "{{cloud_host}}"
+    host: "SP2016WFE1"
     state: started
     delay: 60
   tags:
