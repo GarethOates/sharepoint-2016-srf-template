@@ -1,3 +1,8 @@
+- name: Ensure ADWS started
+  win_service:
+      name: ADWS
+      state: started
+
 - name: Create SharePoint Service Accounts
   win_domain_user:
     name: "{{ item }}"
