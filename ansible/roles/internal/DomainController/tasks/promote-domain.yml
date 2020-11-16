@@ -1,18 +1,51 @@
+- name: Disable Password Security Policy
+  win_security_policy:
+    section: System Access
+    key: PasswordComplexity
+    value: "0"
+  tags:
+    - create-domain
 
-- name: Install Active Directory on Windows Server 2016
-  script: files/create-domain.ps1
-  register: script_result
-  changed_when: "'changed' in script_result.stdout"
+- name: Set Administrator Password
+  win_user:
+      name: Administrator
+      password: Pass@word1!
+  tags:
+    - create-domain
+
+- name: Install Active Directory Feature
+  win_feature:
+    name: AD-domain-services
+    include_management_tools: yes
+  tags:
+    - create-domain
+
+- name: Ensure C:\Windows\NTDS Exists
+  win_file:
+    name: C:\Windows\NTDS
+    state: directory
+  tags:
+    - create-domain
+
+- name: Create new Windows domain in a new forest
+  win_domain:
+    safe_mode_password: Pass@word1!
+    create_dns_delegation: no
+    database_path: C:\Windows\NTDS
+    domain_mode: Win2012R2
+    dns_domain_name: sposcar.local
+    domain_netbios_name: SPOSCAR
+    forest_mode: Win2012R2
+    install_dns: yes
+    log_path: C:\Windows\NTDS
+    sysvol_path: C:\Windows\SYSVOL
+  register: dc_promotion
   tags:
     - create-domain
 
 - name: Reboot for AD changes to take effect.
   win_reboot:
     reboot_timeout: 1200
-  tags:
-    - create-domain
-
-- name: Server is rebooted, now a domain controller.  Stop all other tasks without failing or errors.
-  meta: end_play
+  when: dc_promotion.reboot_required
   tags:
     - create-domain
