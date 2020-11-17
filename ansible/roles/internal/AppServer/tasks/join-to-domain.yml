@@ -1,3 +1,9 @@
+- name: Setup DNS Server to point to DC
+  win_dns_client:
+    adapter_names: "Ethernet 2"
+    ipv4_addresses: "192.168.2.19"
+  tags:
+    - join-to-domain
 
 - name: Join AppServer to Domain Controller
   win_domain_membership:
@@ -7,13 +13,6 @@
       domain_admin_password: "Pass@word1!"
       state: domain
   register: domain_state
-  tags:
-    - join-to-domain
-
-- name: Setup DNS Server to point to DC
-  win_dns_client:
-    adapter_names: "Ethernet 2"
-    ipv4_addresses: "192.168.2.19"
   tags:
     - join-to-domain
 
