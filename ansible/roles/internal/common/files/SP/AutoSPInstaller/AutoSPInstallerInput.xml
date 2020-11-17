@@ -1,4 +1,4 @@
-﻿<Configuration Environment="Test Environment" Version="3.99.60">
+﻿<Configuration Environment="Test Environment" Version="3.99.70">
     <Install SPVersion="2016">
         <ConfigFile>config-AutoSPInstaller.xml</ConfigFile>
         <InstallDir></InstallDir>
@@ -35,6 +35,10 @@
         </CentralAdmin>
         <Database>
             <DBServer>SP2016SQLSERVER</DBServer>
+            <SQLAuthentication Enable="false">
+                <SQLUserName></SQLUserName>
+                <SQLPassword></SQLPassword>
+            </SQLAuthentication>
             <DBAlias Create="false">
                 <DBInstance>SP2016SQLSERVER</DBInstance>
                 <DBPort></DBPort>
@@ -120,6 +124,10 @@
             <Database>
                 <Name>Content_Portal</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -157,6 +165,10 @@
             <Database>
                 <Name>Content_MySites</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -188,6 +200,10 @@
             <Database>
                 <Name>MetaData</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -209,6 +225,10 @@
                 <SyncDB>Sync</SyncDB>
                 <SocialDB>Social</SocialDB>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -236,6 +256,10 @@
                     <Database>
                         <Name>Search</Name>
                         <DBServer></DBServer>
+                        <SQLAuthentication UseFarmSetting="true">
+                            <SQLUserName></SQLUserName>
+                            <SQLPassword></SQLPassword>
+                        </SQLAuthentication>
                         <DBAlias Create="false">
                             <DBInstance></DBInstance>
                             <DBPort></DBPort>
@@ -265,6 +289,10 @@
             <Database>
                 <Name>StateService</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -277,6 +305,10 @@
                 <ReportingDB>WebAnalyticsReporting</ReportingDB>
                 <StagingDB>WebAnalyticsStaging</StagingDB>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -288,6 +320,10 @@
             <Database>
                 <Name>UsageAndHealth</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -300,6 +336,10 @@
             <Database>
                 <Name>SecureStore</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -312,6 +352,10 @@
             <Database>
                 <Name>BusinessDataCatalog</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -324,6 +368,10 @@
             <Database>
                 <Name>WordAutomation</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -337,6 +385,10 @@
             <Database>
                 <Name>AppManagement</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -349,6 +401,10 @@
             <Database>
                 <Name>SubscriptionSettings</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -365,6 +421,10 @@
             <Database>
                 <Name>TranslationService</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -398,6 +458,10 @@
             <Database>
                 <Name>AccessServices</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -412,6 +476,10 @@
             <Database>
                 <Name>PerformancePoint</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -449,6 +517,10 @@
             <Database>
                 <Name>ProjectServer</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>

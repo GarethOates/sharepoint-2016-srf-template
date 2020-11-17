@@ -106,3 +106,8 @@
     username: sposcar.local\vagrant
     password: Pass@word1!
     wait: no
+
+- name: Wait for install to complete
+  win_reboot:
+      pre_reboot_delay: 2400
+      reboot_timeout: 600

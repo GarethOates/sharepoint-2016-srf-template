@@ -18,15 +18,6 @@
   tags:
   - join-to-farm
 
-- name: wait 300 seconds for port 2016 to become open on the host, don't start checking for 60 seconds
-  win_wait_for:
-    port: 2016
-    host: "SP2016WFE"
-    state: started
-    delay: 60
-  tags:
-  - join-to-farm
-
 - name: Join Server to existing SharePoint 2016 Farm
   win_psexec:
     command: powershell.exe Start-Process "$PSHOME\powershell.exe" -ArgumentList "'-NoExit -ExecutionPolicy Bypass  C:\SP\addServerToFarm.ps1 -DBServer SP2016SQLSERVER -DBName DEV_Config -PassPhrase Pass@word1! -SP2016 -ServerRole WebFrontEnd'"
