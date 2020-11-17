@@ -9,13 +9,7 @@
     url: https://download.microsoft.com/download/0/0/4/004EE264-7043-45BF-99E3-3F74ECAE13E5/officeserver.img
     dest: c:\
     force: no
-# - name: Copy Officeserver.img to server
-#   win_copy:
-#     src: ../../common/files/officeserver.img
-#     dest: c:\officeserver.img
-#     force: no
 
-# This task mounts the Officeserver.img file
 - name: Mount the SharePoint Bits IMG
   win_disk_image:
       image_path: c:\officeserver.img
@@ -26,7 +20,6 @@
   win_file:
     path: C:\SP
     state: directory
-
 
 - name: Copy SP folder (SPAutoInstaller folder structure)
   win_copy:
@@ -40,11 +33,6 @@
     dest: C:\SP\2016\SharePoint\
     force: yes
     remote_src: yes
-
-# - name: Unmount SharePoint Bits .img
-#   win_disk_image:
-#     image_path: "{{ disk_image_out.mount_path }}"
-#     state: absent
 
 - name: Install All Required Windows Features
   win_feature:
@@ -97,7 +85,6 @@
     - Windows-Identity-Foundation
     - Xps-Viewer
 
-# make sure to put the prerequisites in the proper folder.
 - name: Download SharePoint Prerequisites
   script: ../../common/files/DownloadPrerequisites.ps1 -SPPrerequisitesPath {{SharePointPrerequisitesPath}}
 

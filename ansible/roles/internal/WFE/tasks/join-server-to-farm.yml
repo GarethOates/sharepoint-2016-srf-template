@@ -21,7 +21,7 @@
 - name: wait 300 seconds for port 2016 to become open on the host, don't start checking for 60 seconds
   win_wait_for:
     port: 2016
-    host: "SP2016WFE1"
+    host: "SP2016WFE"
     state: started
     delay: 60
   tags:
