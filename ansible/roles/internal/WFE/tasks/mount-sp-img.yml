@@ -48,48 +48,27 @@
     - NET-WCF-Pipe-Activation45
     - NET-WCF-HTTP-Activation45
     - Web-Server
-    - Web-WebServer
-    - Web-Common-Http
-    - Web-Static-Content
-    - Web-Default-Doc
-    - Web-Dir-Browsing
-    - Web-Http-Errors
-    - Web-App-Dev
-    - Web-Asp-Net
-    - Web-Asp-Net45
-    - Web-Net-Ext
-    - Web-Net-Ext45
-    - Web-ISAPI-Ext
-    - Web-ISAPI-Filter
-    - Web-Health
-    - Web-Http-Logging
-    - Web-Log-Libraries
-    - Web-Request-Monitor
-    - Web-Http-Tracing
-    - Web-Security
-    - Web-Basic-Auth
-    - Web-Windows-Auth
-    - Web-Filtering
-    - Web-Digest-Auth
-    - Web-Performance
-    - Web-Stat-Compression
-    - Web-Dyn-Compression
-    - Web-Mgmt-Tools
-    - Web-Mgmt-Console
-    - Web-Mgmt-Compat
-    - Web-Metabase
-    - WAS
-    - WAS-Process-Model
-    - WAS-NET-Environment
-    - WAS-Config-APIs
-    - Web-Lgcy-Scripting
     - Windows-Identity-Foundation
     - Xps-Viewer
   register: feature_result
 
-# make sure to put the prerequisites in the proper folder.
 - name: Download SharePoint Prerequisites
-  script: ../../common/files/DownloadPrerequisites.ps1 -SPPrerequisitesPath {{SharePointPrerequisitesPath}}
+  win_get_url:
+    url: "{{ item }}"
+    dest: "{{SharePointPrerequisitesPath}}"
+  with_items:
+    - "https://download.microsoft.com/download/C/3/A/C3A5200B-D33C-47E9-9D70-2F7C65DAAD94/NDP46-KB3045557-x86-x64-AllOS-ENU.exe" # .NET framework 4.6
+    - "https://download.microsoft.com/download/B/E/D/BED73AAC-3C8A-43F5-AF4F-EB4FEA6C8F3A/ENU/x64/sqlncli.msi" # Microsoft SQL Server 2012 SP1 Native Client
+    - "http://download.microsoft.com/download/5/7/2/57249A3A-19D6-4901-ACCE-80924ABEB267/ENU/x64/msodbcsql.msi" #Microsoft ODBC Driver 11 for SQL Server
+    - "http://download.microsoft.com/download/E/0/0/E0060D8F-2354-4871-9596-DC78538799CC/Synchronization.msi" # Microsoft Sync Framework Runtime v1.0 SP1 (x64)
+    - "http://download.microsoft.com//download/0/1/D/01D06854-CA0C-46F1-ADBA-EBF86010DCC6/rtm/MicrosoftIdentityExtensions-64.msi" # MMicrosoft Identity Extensions
+    - "http://download.microsoft.com/download/3/C/F/3CF781F5-7D29-4035-9265-C34FF2369FA2/setup_msipc_x64.exe" # Microsoft Information Protection and Control Client
+    - "http://download.microsoft.com/download/A/6/7/A678AB47-496B-4907-B3D4-0A2D280A13C0/WindowsServerAppFabricSetup_x64.exe" # Windows Server AppFabric 1.1
+    - "http://download.microsoft.com/download/F/1/0/F1093AF6-E797-4CA8-A9F6-FC50024B385C/AppFabric-KB3092423-x64-ENU.exe" # Cumulative Update 7 for Microsoft AppFabric 1.1 for Windows Server
+    - "http://download.microsoft.com/download/C/6/9/C690CC33-18F7-405D-B18A-0A8E199E531C/Windows8.1-KB2898850-x64.msu"
+    - "http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe" # Visual C++ Redistributable Package for Visual Studio 2015,
+    - "http://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe" # Another visual C++ Redistributable Package for Visual Studio 2013/2012,
+    - "http://download.microsoft.com/download/1/C/A/1CAA41C7-88B9-42D6-9E11-3C655656DAB1/WcfDataServices.exe" # Microsoft WCF Data Services 5.6
 
 - name: Install SharePoint Prerequisites via PowerShell
   script: ../../common/files/Install-Prerequisites.ps1 -SharePointBitsPath {{SharePointBitsPath}}
@@ -107,7 +86,25 @@
     password: Pass@word1!
     wait: no
 
-- name: Wait for install to complete
-  win_reboot:
-      pre_reboot_delay: 2400
-      reboot_timeout: 600
+- name: Wait for log file to be created
+  pause:
+    minutes: "1"
+
+- name: Find AutoSPInstall Log File
+  win_find:
+    paths:
+      - C:\Users\vagrant.SPOSCAR\Desktop
+    patterns: ['*.log', '*.txt']
+    get_checksum: no
+  register: logs
+
+- name: Found files
+  debug:
+    var: logs.files[0].path
+
+- name: Wait for 'Press any key' in log file
+  win_wait_for:
+    path: "{{logs.files[0].path}}"
+    regex: Press any key
+    state: present
+    timeout: 2400

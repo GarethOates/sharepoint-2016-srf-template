@@ -80,36 +80,38 @@ Vagrant.configure(2) do |config|
         end
       end
 
-      if ARGV[1].start_with?('DomainController')
-        cfg.vm.provision :ansible do |ansible|
-            ansible.limit = "DomainControllers"
-            ansible.playbook = "ansible/plays/domaincontroller.yml"
+      if ARGV.length >= 2
+        if ARGV[1].start_with?('DomainController')
+          cfg.vm.provision :ansible do |ansible|
+              ansible.limit = "DomainControllers"
+              ansible.playbook = "ansible/plays/domaincontroller.yml"
+              ansible.inventory_path = "ansible/hosts_dev_env.yaml"
+              ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+            end
+
+        elsif ARGV[1].start_with?('WFE')
+          cfg.vm.provision :ansible do |ansible|
+            ansible.limit = "Webservers"
+            ansible.playbook = "ansible/plays/webservers.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
             ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
           end
 
-      elsif ARGV[1].start_with?('WFE')
-        cfg.vm.provision :ansible do |ansible|
-          ansible.limit = "Webservers"
-          ansible.playbook = "ansible/plays/webservers.yml"
-          ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-          ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-        end
+        elsif ARGV[1].start_with?('Database')
+          cfg.vm.provision :ansible do |ansible|
+            ansible.limit = "Databases"
+            ansible.playbook = "ansible/plays/databaseservers.yml"
+            ansible.inventory_path = "ansible/hosts_dev_env.yaml"
+            ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+          end
 
-      elsif ARGV[1].start_with?('Database')
-        cfg.vm.provision :ansible do |ansible|
-          ansible.limit = "Databases"
-          ansible.playbook = "ansible/plays/databaseservers.yml"
-          ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-          ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-        end
-
-      elsif ARGV[1].start_with?('AppServer')
-        cfg.vm.provision :ansible do |ansible|
-          ansible.limit = "AppServers"
-          ansible.playbook = "ansible/plays/appservers.yml"
-          ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-          ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+        elsif ARGV[1].start_with?('AppServer')
+          cfg.vm.provision :ansible do |ansible|
+            ansible.limit = "AppServers"
+            ansible.playbook = "ansible/plays/appservers.yml"
+            ansible.inventory_path = "ansible/hosts_dev_env.yaml"
+            ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+          end
         end
       end
     end

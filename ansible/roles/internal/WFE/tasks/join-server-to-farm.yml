@@ -6,18 +6,6 @@
   tags:
   - join-to-farm
 
-- name: Trigger AutoSPInstaller (computer will restart and continue install)
-  win_psexec:
-    command: C:\SP\AutoSPInstaller\AutoSPInstallerLaunch.bat
-    priority: high
-    elevated: yes
-    interactive: yes
-    username: sposcar\vagrant
-    password: Pass@word1!
-    wait: no
-  tags:
-  - join-to-farm
-
 - name: Join Server to existing SharePoint 2016 Farm
   win_psexec:
     command: powershell.exe Start-Process "$PSHOME\powershell.exe" -ArgumentList "'-NoExit -ExecutionPolicy Bypass  C:\SP\addServerToFarm.ps1 -DBServer SP2016SQLSERVER -DBName DEV_Config -PassPhrase Pass@word1! -SP2016 -ServerRole WebFrontEnd'"
