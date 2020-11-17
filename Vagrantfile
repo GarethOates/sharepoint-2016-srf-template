@@ -89,8 +89,6 @@ Vagrant.configure(2) do |config|
           end
 
       elsif ARGV[1].start_with?('WFE')
-        config.vm.provision "shell", path: "./ansible/roles/internal/DomainController/files/SetDNS.ps1", args:"-DNS 192.168.2.19 -Network 192.168.2.16"
-
         cfg.vm.provision :ansible do |ansible|
           ansible.limit = "Webservers"
           ansible.playbook = "ansible/plays/webservers.yml"
@@ -99,8 +97,6 @@ Vagrant.configure(2) do |config|
         end
 
       elsif ARGV[1].start_with?('Database')
-        config.vm.provision "shell", path: "./ansible/roles/internal/DomainController/files/SetDNS.ps1", args:"-DNS 192.168.2.19 -Network 192.168.2.17"
-
         cfg.vm.provision :ansible do |ansible|
           ansible.limit = "Databases"
           ansible.playbook = "ansible/plays/databaseservers.yml"
@@ -109,8 +105,6 @@ Vagrant.configure(2) do |config|
         end
 
       elsif ARGV[1].start_with?('AppServer')
-        config.vm.provision "shell", path: "./ansible/roles/internal/DomainController/files/SetDNS.ps1", args:"-DNS 192.168.2.19 -Network 192.168.2.18"
-
         cfg.vm.provision :ansible do |ansible|
           ansible.limit = "AppServers"
           ansible.playbook = "ansible/plays/appservers.yml"
