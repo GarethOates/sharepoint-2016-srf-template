@@ -27,12 +27,18 @@
     - SP_Services
     - SP_VisioUser
 
-- name: Make SPOSCAR\vagrant Domain Admin
+- name: Add Admin Account to Domain Admins
   win_domain_user:
-    name: "vagrant"
-    state: present
-    upn: "vagrant@sposcar.local"
+    name: vagrant
+    firstname: Vagrant
+    surname: Account
+    upn: vagrant@sposcar.local
+    password: Pass@word1!
+    password_never_expires: yes
+    account_locked: no
     domain_password: "Pass@word1!"
     domain_username: "Administrator@sposcar.local"
+    state: present
+    groups_action: add
     groups:
-      - "Domain Admins"
+      - Domain Admins

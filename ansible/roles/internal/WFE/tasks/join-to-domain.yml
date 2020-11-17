@@ -8,7 +8,7 @@
 - name: Join Webserver to Domain Controller
   win_domain_membership:
       dns_domain_name: "{{domain}}"
-      hostname: "SP2016WFE1"
+      hostname: "SP2016WFE"
       domain_admin_user: "administrator@sposcar.local"
       domain_admin_password: "Pass@word1!"
       state: domain

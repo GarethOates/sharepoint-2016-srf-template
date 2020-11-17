@@ -108,7 +108,7 @@
     priority: high
     elevated: yes
     interactive: yes
-    username: sposcar\vagrant
+    username: sposcar.local\vagrant
     password: Pass@word1!
     wait: no
 
