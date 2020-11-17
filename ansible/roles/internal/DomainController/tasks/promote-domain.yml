@@ -46,14 +46,9 @@
   tags:
     - create-domain
 
-- name: Set DNS Client on DC
-  win_dns_client:
-      adapter_names: Ethernet
-      ipv4_addresses: "192.168.2.19"
-
-- name: Reboot for AD changes to take effect.
+- name: Reboot for AD changes to take effect
   win_reboot:
-    reboot_timeout: 3000
+    post_reboot_delay: 720
   when: dc_promotion.reboot_required
   tags:
     - create-domain

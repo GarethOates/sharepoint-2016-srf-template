@@ -1,7 +1,7 @@
 - name: Ensure ADWS started
   win_service:
-      name: ADWS
-      state: started
+    name: ADWS
+    state: started
 
 - name: Create SharePoint Service Accounts
   win_domain_user:
@@ -9,6 +9,8 @@
     password: Pass@word1!
     state: present
     upn: "{{ item }}@sposcar.local"
+    domain_password: "Pass@word1!"
+    domain_username: "Administrator@sposcar.local"
   with_items:
     - SP_Admin
     - SP_CacheSuperReader
@@ -24,3 +26,13 @@
     - SP_SearchService
     - SP_Services
     - SP_VisioUser
+
+- name: Make SPOSCAR\vagrant Domain Admin
+  win_domain_user:
+    name: "vagrant"
+    state: present
+    upn: "vagrant@sposcar.local"
+    domain_password: "Pass@word1!"
+    domain_username: "Administrator@sposcar.local"
+    groups:
+      - "Domain Admins"
