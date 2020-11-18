@@ -1,16 +1,12 @@
-# Create a virtual network 
+# Create a virtual network
 resource "azurerm_virtual_network" "spfarmstaging-vnet" {
   name                = "spfarm_staging_network"
   address_space       = ["10.10.0.0/16"]
   location            = "${var.location}"
   resource_group_name = "${var.resource_group_name}"
-  address_space       = ["10.10.0.0/16"]
-  location            = "${var.azure_location}"
-
 }
 
 module "subnet-backend" {
-  
   source                    = "github.com/SharePointOscar/terraform_modules.git//azure_modules//GatewaySubnet"
   sb_name                   = "spfarm-subnet-backend"
   rg_name                   = "${var.resource_group_name}"
@@ -41,7 +37,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-backend" {
     name                = "spfarm-security-group-backend"
     location            = "${var.location}"
     resource_group_name = "${var.resource_group_name}"
-    
+
       # allow SSH connections
       security_rule {
           name                       = "SSH"
@@ -66,7 +62,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-backend" {
           destination_port_range     = "5985"
           source_address_prefix      = "*"
           destination_address_prefix = "*"
-      }   
+      }
 
       # allow RDP connections
       security_rule {
@@ -79,7 +75,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-backend" {
           destination_port_range     = "3389"
           source_address_prefix      = "*"
           destination_address_prefix = "*"
-      }  
+      }
 
     tags {
         environment = "Terraform Demo"
@@ -90,7 +86,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-frontend" {
     name                = "spfarm-security-group-frontend"
     location            = "${var.location}"
     resource_group_name = "${var.resource_group_name}"
-    
+
       # allow SSH connections
       security_rule {
           name                       = "SSH"
@@ -115,7 +111,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-frontend" {
           destination_port_range     = "5985"
           source_address_prefix      = "*"
           destination_address_prefix = "*"
-      }   
+      }
 
       # allow RDP connections
       security_rule {
@@ -128,7 +124,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-frontend" {
           destination_port_range     = "3389"
           source_address_prefix      = "*"
           destination_address_prefix = "*"
-      }  
+      }
 
     tags {
         environment = "Terraform Demo"
@@ -146,6 +142,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-frontend" {
     environment = "staging"
   }
 }
+
 resource "azurerm_network_interface" "spfarm-db1" {
   name                      = "network-interface-spfarm-db1"
   location                  = "${var.location}"
@@ -171,7 +168,7 @@ resource "azurerm_public_ip" "appserver1-public-ip" {
   location                     = "${var.location}"
   resource_group_name          = "${var.resource_group_name}"
   public_ip_address_allocation = "static"
-  
+
   tags {
     environment = "SharePoint 2016 Staging"
   }
@@ -182,9 +179,9 @@ resource "azurerm_network_interface" "spfarm-appserver1" {
   name                          = "network-interface-spfarm-appserver1"
   location                      = "${var.location}"
   resource_group_name           = "${var.resource_group_name}"
-  network_security_group_id     = "${azurerm_network_security_group.spfarm-security-group-backend.id}"  
+  network_security_group_id     = "${azurerm_network_security_group.spfarm-security-group-backend.id}"
   dns_servers                   = ["10.10.1.19"]
-  
+
   ip_configuration {
     name                          = "appserver1-ipconfiguration"
     subnet_id                     = "${module.subnet-application.id}"
@@ -197,7 +194,7 @@ resource "azurerm_network_interface" "spfarm-appserver1" {
   tags {
     environment = "SharePoint 2016 Staging"
   }
-} 
+}
 
 # WFE1 Network settings
 resource "azurerm_public_ip" "wfe-public-ip" {
@@ -206,7 +203,7 @@ resource "azurerm_public_ip" "wfe-public-ip" {
   location                     = "${var.location}"
   resource_group_name          = "${var.resource_group_name}"
   public_ip_address_allocation = "static"
-  
+
   tags {
     environment = "SharePoint 2016 Staging"
   }
@@ -242,8 +239,8 @@ resource "azurerm_public_ip" "ad1-public-ip" {
   location                     = "${var.location}"
   resource_group_name          = "${var.resource_group_name}"
   public_ip_address_allocation = "static"
-  
-  
+
+
   tags {
      environment = "SharePoint 2016 Staging"
   }

@@ -8,7 +8,7 @@ control 'azure_spfarm_virtual_machines' do
     # Check if the VM is located in the correct region
     its('location') { should cmp 'westus' }
 
-     # should have nics attached to it
+    # should have nics attached to it
     it { should have_nics }
 
     # The Public Address Network Interface should exist
@@ -21,7 +21,7 @@ control 'azure_spfarm_virtual_machines' do
     #it { should have_tags }
   end
   describe azure_virtual_machine(group_name: 'spfarmstaging', name: 'SP2016SQLSERVER') do
-   
+
 
     # Check if the VM is located in the correct region
     its('location') { should cmp 'westus' }
