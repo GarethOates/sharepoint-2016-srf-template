@@ -19,7 +19,7 @@
 
 - name: Create c:\SP directory
   win_file:
-    path: C:\SP
+    path: C:\SP\prerequisiteinstallerfiles
     state: directory
 
 - name: Copy SP folder (SPAutoInstaller folder structure)
@@ -55,7 +55,7 @@
 - name: Download SharePoint Prerequisites
   win_get_url:
     url: "{{ item }}"
-    dest: "{{SharePointPrerequisitesPath}}"
+    dest: "{{SharePointPrerequisitesPath}}\\{{ item.split('/')[-1]}}"
   with_items:
     - "https://download.microsoft.com/download/C/3/A/C3A5200B-D33C-47E9-9D70-2F7C65DAAD94/NDP46-KB3045557-x86-x64-AllOS-ENU.exe" # .NET framework 4.6
     - "https://download.microsoft.com/download/B/E/D/BED73AAC-3C8A-43F5-AF4F-EB4FEA6C8F3A/ENU/x64/sqlncli.msi" # Microsoft SQL Server 2012 SP1 Native Client
@@ -108,3 +108,6 @@
     regex: Press any key
     state: present
     timeout: 2400
+
+- name: Reboot server
+  win_reboot:
