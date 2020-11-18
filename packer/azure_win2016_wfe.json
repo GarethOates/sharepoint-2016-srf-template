@@ -4,11 +4,11 @@
   "builders": [{
     "type": "azure-arm",
 
-    "client_id": "<INSERT YOURS>",
-    "client_secret": "pass@word1!",
-    "object_id": "<INSERT YOURS>",
-    "subscription_id": "<INSERT YOURS>",
-    "tenant_id": "<INSERT YOURS>",
+    "client_id": "{{user `client_id`}}",
+    "client_secret": "{{user `client_secret`}}",
+    "object_id": "{{user `object_id`}}",
+    "subscription_id": "{{user `subscription_id`}}",
+    "tenant_id": "{{user `tenant_id`}}",
     "resource_group_name": "spfarmstaging",
     "storage_account": "spfarmstaging",
 
@@ -30,7 +30,7 @@
         "Role": "WFE"
     },
 
-    "location": "West US",
+    "location": "northeurope",
     "vm_size": "Standard_DS2_v2"
   }],
     "provisioners": [

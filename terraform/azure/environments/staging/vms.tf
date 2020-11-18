@@ -6,7 +6,7 @@ resource "azurerm_virtual_machine" "spfarm_appserver1" {
   vm_size               = "Standard_DS2_v2"
   network_interface_ids = ["${azurerm_network_interface.spfarm-appserver1.id}"]
     
-  # Tells Terraform that this VM   must be created only after the
+  # Tells Terraform that this VM must be created only after the
   # Domain Controller has been created.
   depends_on = ["azurerm_virtual_machine.spfarm_ad1"]
 
@@ -106,13 +106,13 @@ resource "azurerm_virtual_machine" "spfarm_wfe1" {
   network_interface_ids = ["${element(azurerm_network_interface.spfarm-wfe.*.id, count.index)}"]
   availability_set_id   = "${azurerm_availability_set.WebFrontEnd_AvailabilitySet.id}" 
 
- # Uncomment this line to delete the OS disk automatically when deleting the VM
- # delete_os_disk_on_termination = true
+  # Uncomment this line to delete the OS disk automatically when deleting the VM
+  # delete_os_disk_on_termination = true
 
- # Uncomment this line to delete the data disks automatically when deleting the VM
- delete_data_disks_on_termination = true
+  # Uncomment this line to delete the data disks automatically when deleting the VM
+  delete_data_disks_on_termination = true
 
-   storage_os_disk {
+  storage_os_disk {
     name          = "WFE${count.index}-osdisk1"
     os_type       = "Windows"
     caching       = "ReadWrite"
@@ -131,8 +131,6 @@ resource "azurerm_virtual_machine" "spfarm_wfe1" {
         provision_vm_agent = true
         enable_automatic_upgrades = true
   } 
-
-  
 }
 
 

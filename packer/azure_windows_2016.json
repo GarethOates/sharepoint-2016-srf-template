@@ -1,19 +1,15 @@
 {  
- "variables": {},
+  "variables": {},
 
   "builders": [{
+    "client_id": "{{user `client_id`}}",
+    "client_secret": "{{user `client_secret`}}",
+    "subscription_id": "{{user `subscription_id`}}",
+    "tenant_id": "{{user `tenant_id`}}",
+    
     "type": "azure-arm",
-
-    "client_id": "<INSERT YOURS>",
-    "client_secret": "pass@word1!",
-    "object_id": "<INSERT YOURS>",
-    "subscription_id": "<INSERT YOURS>",
-    "tenant_id": "<INSERT YOURS>",
-    "resource_group_name": "spfarmstaging",
-    "storage_account": "spfarmstaging",
-
-    "capture_container_name": "spfarmstaging",
-    "capture_name_prefix": "packer",
+    "managed_image_resource_group_name": "sp2016-vera",
+    "managed_image_name": "spfarm2016",
 
     "os_type": "Windows",
     "image_publisher": "MicrosoftWindowsServer",
@@ -28,11 +24,10 @@
 
     "azure_tags": {
         "environment": "Staging",
-        "task": "Image deployment",
-        "SharePoint Role": "WFE"
+        "task": "Image deployment"
     },
 
-    "location": "West US",
+    "location": "northeurope",
     "vm_size": "Standard_DS2_v2"
   }],
     "provisioners": [
@@ -48,7 +43,9 @@
     {
       "type": "windows-shell",
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
-      "scripts": ["scripts/pin-powershell.bat","scripts/set-winrm-automatic.bat"]
+      "scripts": [
+        "scripts/set-winrm-automatic.bat"
+      ]
     },
     {
       "type": "powershell",
@@ -68,6 +65,5 @@
             "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Write-Output $imageState.ImageState; Start-Sleep -s 10  } else { break } }"
         ]
     }
-   
   ]
 }
