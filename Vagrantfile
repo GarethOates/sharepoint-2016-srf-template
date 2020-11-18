@@ -56,6 +56,7 @@ Vagrant.configure(2) do |config|
       cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
       cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
       cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
+      cfg.vm.network :forwarded_port, guest: 2016, host: 2016, id: "spadmin", auto_correct: true
 
       if box
         cfg.vm.box = box
@@ -110,6 +111,7 @@ Vagrant.configure(2) do |config|
             ansible.limit = "AppServers"
             ansible.playbook = "ansible/plays/appservers.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
+            ansible.verbose = "vvvv"
             ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
           end
         end
