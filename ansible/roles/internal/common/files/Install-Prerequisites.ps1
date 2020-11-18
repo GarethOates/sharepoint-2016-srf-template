@@ -1,6 +1,5 @@
 #Directory path where SP 2016 RTM files are kept
 param([Parameter(Mandatory=$true,ValueFromPipeline=$true)]$SharePointBitsPath)
-        
 write-host " $SharePointBitsPath is the path where the SP binaries are located"
 write-host "$SharePointBitsPath\PrerequisiteInstaller.exe"
 
@@ -17,6 +16,6 @@ Start-Process  "$SharePointBitsPath\PrerequisiteInstaller.exe" -ArgumentList "`
                 /DotNetFx:`"$PreReqsFilesPath\NDP46-KB3045557-x86-x64-AllOS-ENU.exe`" /unattended`
                 /MSVCRT11:`"$PreReqsFilesPath\vcredist_x64.exe`" /unattended`
                 /MSVCRT14:`"$PreReqsFilesPath\vc_redist.x64.exe`" /unattended`
-                /KB3092423:`"$PreReqsFilesPath\AppFabric-KB3092423-x64-ENU.exe`" /unattended" -NoNewWindow  -Wait    
+                /KB3092423:`"$PreReqsFilesPath\AppFabric-KB3092423-x64-ENU.exe`" /unattended" -NoNewWindow  -Wait
 
                 write-host "Successfully Installed SP Prerequisites...."

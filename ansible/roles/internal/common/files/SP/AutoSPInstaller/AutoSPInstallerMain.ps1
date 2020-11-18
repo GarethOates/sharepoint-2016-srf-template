@@ -7,7 +7,7 @@
 )
 
 # Globally update all instances of "localhost" in the input file to actual local server name
-[xml]$xmlinput = (Get-Content $inputFile -ErrorAction Inquire) -replace ("localhost", $env:COMPUTERNAME) # "-ErrorAction Inquire" should show something meaningful now instead of just quickly skipping over a bad or malformed XML
+[xml]$xmlInput = (Get-Content $inputFile -ErrorAction Inquire) -replace ("localhost", $env:COMPUTERNAME) # "-ErrorAction Inquire" should show something meaningful now instead of just quickly skipping over a bad or malformed XML
 
 # ===================================================================================
 #
@@ -15,45 +15,49 @@
 #
 # ===================================================================================
 
-#Region Setup Paths & Environment
+#region Setup Paths & Environment
 
 $Host.UI.RawUI.WindowTitle = " -- AutoSPInstaller -- $env:COMPUTERNAME --"
 $Host.UI.RawUI.BackgroundColor = "Black"
 Clear-Host
 $0 = $myInvocation.MyCommand.Definition
 $env:dp0 = [System.IO.Path]::GetDirectoryName($0)
-$bits = Get-Item $env:dp0 | Split-Path -Parent
+$env:bits = Get-Item $env:dp0 | Split-Path -Parent
 
-#Region Source External Functions
-. "$env:dp0\AutoSPInstallerFunctions.ps1"
-. "$env:dp0\AutoSPInstallerFunctionsCustom.ps1"
-#EndRegion
+#region Source External Functions
+Write-Host -ForegroundColor White " - Importing AutoSPInstaller PowerShell Module..."
+Import-Module -Name "$env:dp0\AutoSPInstallerModule.psm1" -Force
+#endregion
 
-# Create hash tables with major version to product year mappings & vice-versa
-$spYears = @{"14" = "2010"; "15" = "2013"; "16" = "2016"}
-$spVersions = @{"2010" = "14"; "2013" = "15"; "2016" = "16"}
+# Create hash table with product year to major version mappings
+$spVersions = @{"2010" = "14"; "2013" = "15"; "2016" = "16"; "2019" = "16"} # SharePoint 2019 still uses major build 16
+$spYear = $xmlInput.Configuration.Install.SPVersion
+if ([string]::IsNullOrEmpty($spYear))
+{
+    throw "SharePoint version (year) was not specified in `"$inputFile`""
+}
 
-if ($xmlinput.Configuration.Install.SKU -eq "Foundation") {$product = "Foundation"}
+if ($xmlInput.Configuration.Install.SKU -eq "Foundation") {$product = "Foundation"}
 else {$product = "SharePoint"}
 
 # Check if SharePoint binaries are in the \SP20xx\$product subfolder as per new folder structure
-# Look for SP2013 or SP2016
-If (($xmlinput.Configuration.Install.SPVersion -eq "2013") -or ($xmlinput.Configuration.Install.SPVersion -eq "2016"))
+# Look for SP2013+
+If ($spYear -ge 2013)
 {
-    if (Test-Path -Path "$bits\$($xmlinput.Configuration.Install.SPVersion)\$product\setup.exe")
+    if (Test-Path -Path "$env:bits\$($spYear)\$product\setup.exe" -ErrorAction SilentlyContinue)
     {
-        $env:SPbits = $bits+"\$($xmlinput.Configuration.Install.SPVersion)\$product"
+        $env:SPbits = $env:bits+"\$($spYear)\$product"
     }
-    else {Write-Host -ForegroundColor Yellow " - SP$($xmlinput.Configuration.Install.SPVersion) was specified in $($inputfile.replace($bits,'')),`n - but $bits\$($xmlinput.Configuration.Install.SPVersion)\$product\setup.exe was not found. Looking for SP2010..."}
+    else {Write-Host -ForegroundColor Yellow " - SP$($spYear) was specified in $($inputfile.replace($env:bits,'')),`n - but $env:bits\$($spYear)\$product\setup.exe was not found. Looking for SP2010..."}
 }
-# If 2013/2016 bits aren't found, look for SP2010 bits and ensure they match the value specified in $xmlinput
-ElseIf ((Test-Path -Path "$bits\2010\$product\setup.exe") -and ($xmlinput.Configuration.Install.SPVersion -eq "2010"))
+# If 2013+ bits aren't found, look for SP2010 bits and ensure they match the value specified in $xmlInput
+ElseIf ((Test-Path -Path "$env:bits\2010\$product\setup.exe" -ErrorAction SilentlyContinue) -and ($spYear -eq "2010"))
 {
-    $env:SPbits = $bits+"\2010\$product"
+    $env:SPbits = $env:bits+"\2010\$product"
 }
-Elseif (Test-Path -Path "$bits\$product\setup.exe") # Use old path convention
+Elseif (Test-Path -Path "$env:bits\$product\setup.exe" -ErrorAction SilentlyContinue) # Use old path convention
 {
-    $env:SPbits = $bits+"\$product"
+    $env:SPbits = $env:bits+"\$product"
 }
 if ([string]::IsNullOrEmpty($env:SPbits))
 {
@@ -63,26 +67,25 @@ if ([string]::IsNullOrEmpty($env:SPbits))
     # If no setup binaries are present, this might be OK if SharePoint is already installed and we've specified the version in the XML
     $spInstalled = $true
     # Check to see that we've at least specified the desired version in the XML
-    if (($xmlinput.Configuration.Install.SPVersion -eq "2010") -or ($xmlinput.Configuration.Install.SPVersion -eq "2013") -or ($xmlinput.Configuration.Install.SPVersion -eq "2016"))
+    if ($spVersions.Keys -contains $spyear)
     {
         # Grab the version from the hashtable
-        $env:spVer = $spVersions.($xmlinput.Configuration.Install.SPVersion)
+        $spVer = $spVersions.$spYear
     }
     else {Throw " - Cannot determine version of SharePoint setup binaries, and no Version was specified in `"$(Split-Path -Path $inputFile -Leaf)`"."}
 }
 else
 {
-    $env:spVer,$null = (Get-Item -Path "$env:SPbits\setup.exe").VersionInfo.ProductVersion -split "\."
+    $setupVersion = (Get-Item -Path "$env:SPbits\setup.exe").VersionInfo.ProductVersion
+    $spVer,$null,$spBuild,$null = $setupVersion -split "\."
 }
-$spYear = $spYears.$env:spVer
-$PSConfig = "$env:CommonProgramFiles\Microsoft Shared\Web Server Extensions\$env:spVer\BIN\psconfig.exe"
-$PSConfigUI = "$env:CommonProgramFiles\Microsoft Shared\Web Server Extensions\$env:spVer\BIN\psconfigui.exe"
+$PSConfigUI = "$env:CommonProgramFiles\Microsoft Shared\Web Server Extensions\$spVer\BIN\psconfigui.exe"
 
-$script:DBPrefix = $xmlinput.Configuration.Farm.Database.DBPrefix
-If (($dbPrefix -ne "") -and ($dbPrefix -ne $null)) {$script:DBPrefix += "_"}
+$script:DBPrefix = $xmlInput.Configuration.Farm.Database.DBPrefix
+If (($dbPrefix -ne "") -and ($null -ne $dbPrefix)) {$script:DBPrefix += "_"}
 If ($dbPrefix -like "*localhost*") {$script:DBPrefix = $dbPrefix -replace "localhost","$env:COMPUTERNAME"}
 
-if ($xmlinput.Configuration.Install.RemoteInstall.Enable -eq $true)
+if ($xmlInput.Configuration.Install.RemoteInstall.Enable -eq $true)
 {
     if ((Get-ItemProperty -Path "HKLM:\SOFTWARE\AutoSPInstaller\" -ErrorAction SilentlyContinue).CancelRemoteInstall -eq "1")
     {
@@ -101,9 +104,9 @@ else
 
 Write-Host -ForegroundColor White " - Setting power management plan to `"High Performance`"..."
 Start-Process -FilePath "$env:SystemRoot\system32\powercfg.exe" -ArgumentList "/s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c" -NoNewWindow
-#EndRegion
+#endregion
 
-#Region Remote Install
+#region Remote Install
 Function Install-Remote
 {
     If ($enableRemoteInstall)
@@ -117,10 +120,10 @@ Function Install-Remote
         Enable-CredSSP $remoteFarmServers
         ForEach ($server in $remoteFarmServers)
         {
-            If ($xmlinput.Configuration.Install.RemoteInstall.ParallelInstall -eq $true) # Launch each farm server install simultaneously
+            If ($xmlInput.Configuration.Install.RemoteInstall.ParallelInstall -eq $true) # Launch each farm server install simultaneously
             {
                 Start-Process -FilePath "$PSHOME\powershell.exe" -ArgumentList "-ExecutionPolicy Bypass Invoke-Command -ScriptBlock {
-                                                                                . `"$env:dp0\AutoSPInstallerFunctions.ps1`"; `
+                                                                                Import-Module -Name $env:dp0\AutoSPInstallerModule.psm1 -Force; `
                                                                                 StartTracing -Server $server; `
                                                                                 Test-ServerConnection -Server $server; `
                                                                                 Enable-RemoteSession -Server $server -Password $(ConvertFrom-SecureString $($credential.Password)); `
@@ -157,60 +160,68 @@ Function Install-Remote
         Write-Host -ForegroundColor White " - but <RemoteInstall> is not set to `"true`" - nothing else to do."
     }
 }
-#EndRegion
+#endregion
 
-#Region Prepare For Install
+#region Prepare For Install
 Function PrepForInstall
 {
-    CheckXMLVersion $xmlinput
-    CheckInput
-    Write-Host -ForegroundColor White " - Install based on: `n  - $inputFile `n  - Environment: $($xmlinput.Configuration.getAttribute(`"Environment`")) `n  - Version: $($xmlinput.Configuration.getAttribute(`"Version`"))"
-    $spInstalled = (Get-SharePointInstall)
-    ValidateCredentials $xmlinput
-    ValidatePassphrase $xmlinput
-    CheckConfigFiles $xmlinput
-    CheckSQLAccess
+    CheckXMLVersion $xmlInput
+    CheckInput $inputFile
+    Write-Host -ForegroundColor White " - Install based on: `n  - $inputFile `n  - Environment: $($xmlInput.Configuration.getAttribute(`"Environment`")) `n  - Version: $($xmlInput.Configuration.getAttribute(`"Version`"))"
+    ValidateCredentials $xmlInput
+    ValidatePassphrase $xmlInput
+    CheckConfigFiles $xmlInput
+    # Pass SQL username and password to the CheckSQLAccess function if we are using SQL auth
+    if ($xmlInput.Configuration.Farm.Database.SQLAuthentication.Enable -eq "true")
+    {
+        CheckSQLAccess -xmlinput $xmlInput -SqlAccount $xmlInput.Configuration.Farm.Database.SQLAuthentication.SQLUserName -SqlPass $xmlInput.Configuration.Farm.Database.SQLAuthentication.SQLPassword
+    }
+    # Otherwise just assume Windows integrated authentication and skip passing SQL login info
+    else
+    {
+        CheckSQLAccess -xmlinput $xmlInput
+    }
 }
-#EndRegion
+#endregion
 
-#Region Install SharePoint binaries
-Function Run-Install
+#region Install SharePoint binaries
+Function Start-Install
 {
-    DisableLoopbackCheck $xmlinput
-    RemoveIEEnhancedSecurity $xmlinput
-    UnblockFiles -path "$bits\$spyear"
-    DisableServices $xmlinput
-    DisableCRLCheck $xmlinput
-    InstallPrerequisites $xmlinput
-    ConfigureIISLogging $xmlinput
-    InstallSharePoint $xmlinput
+    DisableLoopbackCheck $xmlInput
+    RemoveIEEnhancedSecurity $xmlInput
+    UnblockFiles -path "$env:bits\$spYear"
+    DisableServices $xmlInput
+    DisableCRLCheck $xmlInput
+    InstallPrerequisites $xmlInput
+    ConfigureIISLogging $xmlInput
+    InstallSharePoint $xmlInput
     # Try to apply a recent CU for the AppFabric Caching Service if we're installing at least SP2013
-    if ($env:SPVer -ge 15) {Install-AppFabricCU $xmlinput}
-    InstallOfficeWebApps2010 $xmlinput
-    InstallProjectServer $xmlinput
-    InstallLanguagePacks $xmlinput
-    InstallUpdates
-    FixTaxonomyPickerBug
+    if ($spVer -ge 15) {Install-AppFabricCU $xmlInput}
+    InstallOfficeWebApps2010 $xmlInput
+    InstallProjectServer $xmlInput
+    InstallLanguagePacks $xmlInput
+    InstallUpdates $xmlInput
+    FixTaxonomyPickerBug $xmlInput
     Set-ShortcutRunAsAdmin -shortcutFile "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Microsoft SharePoint $spYear Products\SharePoint $spYear Management Shell.lnk"
 }
-#EndRegion
+#endregion
 
-#Region Setup Farm
-Function Setup-Farm
+#region Setup Farm
+Function Set-FarmConfig ([xml]$xmlInput)
 {
-    [System.Management.Automation.PsCredential]$farmCredential = GetFarmCredentials $xmlinput
-    [security.securestring]$secPhrase = GetSecureFarmPassphrase $xmlinput
-    ConfigureFarmAdmin $xmlinput
-    Load-SharePoint-PowerShell
-    CreateOrJoinFarm $xmlinput ([security.securestring]$secPhrase) ([System.Management.Automation.PsCredential]$farmCredential)
-    CheckFarmTopology $xmlinput
-    ConfigureFarm $xmlinput
-    ConfigureDiagnosticLogging $xmlinput
-    ConfigureOfficeWebApps $xmlinput
-    $languagePackInstalled = (Get-Item -Path "HKLM:\SOFTWARE\Microsoft\Shared Tools\Web Server Extensions\$env:spVer.0\WSS\").GetValue("LanguagePackInstalled")
-    ConfigureLanguagePacks $xmlinput
-    AddManagedAccounts $xmlinput
-    if (($env:SPver -eq "16") -and ($languagePackInstalled))
+    [System.Management.Automation.PsCredential]$farmCredential = GetFarmCredentials $xmlInput
+    [security.securestring]$secPhrase = GetSecureFarmPassphrase $xmlInput
+    ConfigureFarmAdmin $xmlInput
+    Add-SharePointPSSnapin
+    CreateOrJoinFarm $xmlInput ([security.securestring]$secPhrase) ([System.Management.Automation.PsCredential]$farmCredential)
+    CheckFarmTopology $xmlInput
+    ConfigureFarm $xmlInput
+    ConfigureDiagnosticLogging $xmlInput
+    ConfigureOfficeWebApps $xmlInput
+    $languagePackInstalled = (Get-Item -Path "HKLM:\SOFTWARE\Microsoft\Shared Tools\Web Server Extensions\$spVer.0\WSS\").GetValue("LanguagePackInstalled")
+    ConfigureLanguagePacks $xmlInput
+    AddManagedAccounts $xmlInput
+    if (($spYear -eq 2016) -and ($languagePackInstalled -eq 1))
     {
         Write-Host -ForegroundColor Yellow " - We need to re-launch the script to work around a known issue with SP2016 when language packs are installed."
         $scriptCommandLine = $($MyInvocation.Line)
@@ -225,66 +236,66 @@ Function Setup-Farm
             exit
         }
     }
-    CreateWebApplications $xmlinput
+    CreateWebApplications $xmlInput
 }
-#EndRegion
+#endregion
 
-#Region Setup Services
-Function Setup-Services
+#region Setup Services
+Function Set-ServiceConfig  ([xml]$xmlInput)
 {
-    ConfigureSandboxedCodeService $xmlinput
-    CreateStateServiceApp $xmlinput
-    CreateMetadataServiceApp $xmlinput
-    ConfigureClaimsToWindowsTokenService $xmlinput
-    CreateUserProfileServiceApplication $xmlinput
-    CreateSPUsageApp $xmlinput
-    ConfigureUsageLogging $xmlinput
-    CreateWebAnalyticsApp $xmlinput
-    CreateSecureStoreServiceApp $xmlinput
-    ConfigureFoundationSearch $xmlinput
-    ConfigureTracing $xmlinput
-    CreateEnterpriseSearchServiceApp $xmlinput
-    CreateBusinessDataConnectivityServiceApp $xmlinput
-    CreateExcelServiceApp $xmlinput
-    CreateAccess2010ServiceApp $xmlinput
-    CreateVisioServiceApp $xmlinput
-    CreatePerformancePointServiceApp $xmlinput
-    CreateWordAutomationServiceApp $xmlinput
-    CreateProjectServerServiceApp $xmlinput
-    ConfigureWorkflowTimerService $xmlinput
-    if ($env:spVer -eq "14") # These are for SP2010 / Office Web Apps 2010 only
+    ConfigureSandboxedCodeService $xmlInput
+    CreateStateServiceApp $xmlInput
+    CreateMetadataServiceApp $xmlInput
+    ConfigureClaimsToWindowsTokenService $xmlInput
+    CreateUserProfileServiceApplication $xmlInput
+    CreateSPUsageApp $xmlInput
+    ConfigureUsageLogging $xmlInput
+    CreateWebAnalyticsApp $xmlInput
+    CreateSecureStoreServiceApp $xmlInput
+    ConfigureFoundationSearch $xmlInput
+    ConfigureTracing $xmlInput
+    CreateEnterpriseSearchServiceApp $xmlInput
+    CreateBusinessDataConnectivityServiceApp $xmlInput
+    CreateExcelServiceApp $xmlInput
+    CreateAccess2010ServiceApp $xmlInput
+    CreateVisioServiceApp $xmlInput
+    CreatePerformancePointServiceApp $xmlInput
+    CreateWordAutomationServiceApp $xmlInput
+    CreateProjectServerServiceApp $xmlInput
+    ConfigureWorkflowTimerService $xmlInput
+    if ($spYear -eq 2010) # These are for SP2010 / Office Web Apps 2010 only
     {
-        CreateExcelOWAServiceApp $xmlinput
-        CreatePowerPointOWAServiceApp $xmlinput
-        CreateWordViewingOWAServiceApp $xmlinput
+        CreateExcelOWAServiceApp $xmlInput
+        CreatePowerPointOWAServiceApp $xmlInput
+        CreateWordViewingOWAServiceApp $xmlInput
     }
-    if ($env:spVer -ge "15") # These are for SP2013+ only
-	{
-		CreateAppManagementServiceApp $xmlinput
-		CreateSubscriptionSettingsServiceApp $xmlinput
-        CreateWorkManagementServiceApp $xmlinput
-        CreateMachineTranslationServiceApp $xmlinput
-        CreateAccessServicesApp $xmlinput
-        CreatePowerPointConversionServiceApp $xmlinput
-	    ConfigureDistributedCacheService $xmlinput
+    if ($spVer -ge 15) # These are for SP2013+ only
+    {
+        CreateAppManagementServiceApp $xmlInput
+        CreateSubscriptionSettingsServiceApp $xmlInput
+        CreateWorkManagementServiceApp $xmlInput
+        CreateMachineTranslationServiceApp $xmlInput
+        CreateAccessServicesApp $xmlInput
+        CreatePowerPointConversionServiceApp $xmlInput
+        ConfigureDistributedCacheService $xmlInput
     }
-    if (((Get-WmiObject Win32_OperatingSystem).Version -like "6.2*" -or (Get-WmiObject Win32_OperatingSystem).Version -like "6.3*") -and ($env:spVer -eq "14"))
+    if (((Get-CimInstance -ClassName Win32_OperatingSystem).Version -like "6.2*" -or (Get-CimInstance -ClassName Win32_OperatingSystem).Version -like "6.3*") -and ($spVer -eq 14))
     {
         Write-Host -ForegroundColor White " - Installing SMTP Windows feature in a separate PowerShell window..."
-        Start-Process -FilePath "$PSHOME\powershell.exe" -Verb Runas -ArgumentList "-Command `". $env:dp0\AutoSPInstallerFunctions.ps1`"; InstallSMTP (Get-Content $inputFile); Start-Sleep 5`"" -Wait
+        Start-Process -FilePath "$PSHOME\powershell.exe" -Verb Runas -ArgumentList "-Command `"Import-Module -Name $env:dp0\AutoSPInstallerModule.psm1 -Force; InstallSMTP (Get-Content $inputFile); Start-Sleep 5`"" -Wait
     }
-    else {InstallSMTP $xmlinput}
-    ConfigureOutgoingEmail $xmlinput
-    ConfigureIncomingEmail $xmlinput
-    Configure-PDFSearchAndIcon $xmlinput
-    ConfigureFoundationWebApplicationService $xmlinput
-    InstallForeFront $xmlinput
+    else {InstallSMTP $xmlInput}
+    ConfigureOutgoingEmail $xmlInput
+    ConfigureIncomingEmail $xmlInput
+    Set-PDFSearchAndIcon $xmlInput
+    ConfigureFoundationWebApplicationService $xmlInput
+    InstallForeFront $xmlInput
 }
-#EndRegion
+#endregion
 
-#Region Finalize Install (perform any cleanup operations)
+#region Finalize Install (perform any cleanup operations)
 # Run last
-Function Finalize-Install
+Function Complete-Install ([xml]$xmlInput)
 {
     # Perform these steps only if the local server is a SharePoint farm server
     If (MatchComputerName $farmServers $env:COMPUTERNAME)
@@ -292,8 +303,8 @@ Function Finalize-Install
         # Remove Farm Account from local Administrators group to avoid big scary warnings in Central Admin
         # But only if the script actually put it there, and we want to leave it there
         # (e.g. to work around the issue with native SharePoint backups deprovisioning UPS per http://www.toddklindt.com/blog/Lists/Posts/Post.aspx?ID=275)
-        $farmAcct = $xmlinput.Configuration.Farm.Account.Username
-        If (!($runningAsFarmAcct) -and ($xmlinput.Configuration.Farm.Account.AddToLocalAdminsDuringSetup -eq $true) -and ($xmlinput.Configuration.Farm.Account.LeaveInLocalAdmins -eq $false))
+        $farmAcct = $xmlInput.Configuration.Farm.Account.Username
+        If (!($runningAsFarmAcct) -and ($xmlInput.Configuration.Farm.Account.AddToLocalAdminsDuringSetup -eq $true) -and ($xmlInput.Configuration.Farm.Account.LeaveInLocalAdmins -eq $false))
         {
             $builtinAdminGroup = Get-AdministratorsGroup
             Write-Host -ForegroundColor White " - Removing $farmAcct from local group `"$builtinAdminGroup`"..."
@@ -320,23 +331,23 @@ Function Finalize-Install
             If (-not $?) {Throw}
         }
         Catch {Write-Host -ForegroundColor White " - Network Service is already a member."}
-        Run-HealthAnalyzerJobs
+        Invoke-HealthAnalyzerJobs
     }
 
     Write-Host -ForegroundColor White " - Completed!`a"
     $Host.UI.RawUI.WindowTitle = " -- Completed -- $env:COMPUTERNAME --"
     $env:EndDate = Get-Date
 }
-#EndRegion
+#endregion
 
-#Region MAIN - Check for input file and start the install
+#region MAIN - Check for input file and start the install
 
 If (!([string]::IsNullOrEmpty($targetServer))) {$farmServers = $targetServer}
-Else {$farmServers = Get-FarmServers $xmlinput}
+Else {$farmServers = Get-FarmServers $xmlInput}
 $remoteFarmServers = $farmServers | Where-Object {-not (MatchComputerName $_ $env:COMPUTERNAME)}
 $password = $remoteAuthPassword
-If ([string]::IsNullOrEmpty($password)) {$password = $xmlinput.Configuration.Install.AutoAdminLogon.Password}
-If (($enableRemoteInstall -and !([string]::IsNullOrEmpty($remoteFarmServers))) -or ($xmlinput.Configuration.Install.AutoAdminLogon.Enable -eq $true))
+If ([string]::IsNullOrEmpty($password)) {$password = $xmlInput.Configuration.Install.AutoAdminLogon.Password}
+If (($enableRemoteInstall -and !([string]::IsNullOrEmpty($remoteFarmServers))) -or ($xmlInput.Configuration.Install.AutoAdminLogon.Enable -eq $true))
 {
     If (Confirm-LocalSession)
     {
@@ -347,15 +358,14 @@ If (($enableRemoteInstall -and !([string]::IsNullOrEmpty($remoteFarmServers))) -
                 Write-Host -ForegroundColor White " - Using pre-provided credentials..."
                 $credential = New-Object System.Management.Automation.PsCredential $env:USERDOMAIN\$env:USERNAME,$(ConvertTo-SecureString -String $password -AsPlainText -Force -ErrorAction SilentlyContinue)
             }
-       
-          If (!$credential) # Otherwise prompt for the remote auth or AutoAdminLogon credential
+            If (!$credential) # Otherwise prompt for the remote auth or AutoAdminLogon credential
             {
                 Write-Host -ForegroundColor White " - Prompting for remote/autologon credentials..."
-                #$credential = $host.ui.PromptForCredential("AutoSPInstaller - Remote/Automatic Install", "Enter Credentials for Remote/Automatic Authentication:", "$env:USERDOMAIN\$env:USERNAME", "NetBiosUserName")
-            } 
+                $credential = $host.ui.PromptForCredential("AutoSPInstaller - Remote/Automatic Install", "Enter Credentials for Remote/Automatic Authentication:", "$env:USERDOMAIN\$env:USERNAME", "NetBiosUserName")
+            }
             $currentDomain = "LDAP://" + ([ADSI]"").distinguishedName
             $null,$user = $credential.Username -split "\\"
-            If (($user -ne $null) -and ($credential.Password -ne $null)) {$password = ConvertTo-PlainText $credential.Password}
+            If (($null -ne $user) -and ($null -ne $credential.Password)) {$password = ConvertTo-PlainText $credential.Password}
             Else
             {
                 If ($enableRemoteInstall -and !([string]::IsNullOrEmpty($remoteFarmServers))) {Write-Error " - Credentials are required for remote authentication."; Pause "exit"; Throw}
@@ -363,7 +373,7 @@ If (($enableRemoteInstall -and !([string]::IsNullOrEmpty($remoteFarmServers))) -
             }
             Write-Host -ForegroundColor White " - Checking credentials: `"$($credential.Username)`"..." -NoNewline
             $dom = New-Object System.DirectoryServices.DirectoryEntry($currentDomain,$user,$password)
-            If ($dom.Path -ne $null)
+            If ($null -ne $dom.Path)
             {
                 Write-Host -ForegroundColor Black -BackgroundColor Green "Verified."
                 $credentialVerified = $true
@@ -396,13 +406,13 @@ If (MatchComputerName $farmServers $env:COMPUTERNAME)
             Write-Host -ForegroundColor White " - SharePoint $spYear binaries are"($spInstalled -replace "True","already" -replace "False","not yet") "installed."
         }
         PrepForInstall
-        Run-Install
+        Start-Install
         Write-Host -ForegroundColor White " - SharePoint $spYear binary file installation done!"
 
-        #Region Re-Launch Script under PowerShell v2
+        #region Re-Launch Script under PowerShell v2
         # Check for SharePoint 2010 on Windows Server 2012, and re-launch script under PowerShell version 2 if it's not already
         # Required for compatibility
-        if (((Get-WmiObject Win32_OperatingSystem).Version -like "6.2*" -or (Get-WmiObject Win32_OperatingSystem).Version -like "6.3*") -and ($host.Version.Major -gt 2) -and ($env:spVer -eq "14"))
+        if (((Get-CimInstance -ClassName Win32_OperatingSystem).Version -like "6.2*" -or (Get-CimInstance -ClassName Win32_OperatingSystem).Version -like "6.3*") -and ($host.Version.Major -gt 2) -and ($spVer -eq 14))
         {
             Write-Host -ForegroundColor Yellow " - A version of PowerShell greater than 2.0 was detected."
             Write-Host -ForegroundColor Yellow " - We need to re-launch the script to enable PowerShell version 2 for SharePoint $spYear."
@@ -419,15 +429,15 @@ If (MatchComputerName $farmServers $env:COMPUTERNAME)
             }
             exit
         }
-        #EndRegion
+        #endregion
 
-        If (($xmlinput.Configuration.Install.PauseAfterInstall -eq $true) -or ($xmlinput.Configuration.Install.RemoteInstall.ParallelInstall -eq $true))
+        If (($xmlInput.Configuration.Install.PauseAfterInstall -eq $true) -or ($xmlInput.Configuration.Install.RemoteInstall.ParallelInstall -eq $true))
         {
             Pause "proceed with farm configuration" "y"
         }
-        Setup-Farm
-        Setup-Services
-        Finalize-Install
+        Set-FarmConfig -xmlinput $xmlInput
+        Set-ServiceConfig -xmlinput $xmlInput
+        Complete-Install -xmlinput $xmlInput
         # We only want to Install-Remote if we aren't already *in* a remote session, and if there are actually remote servers to install!
         If ((Confirm-LocalSession) -and !([string]::IsNullOrEmpty($remoteFarmServers))) {Install-Remote}
     }
@@ -435,7 +445,7 @@ If (MatchComputerName $farmServers $env:COMPUTERNAME)
     {
         WriteLine
         Write-Host -ForegroundColor Yellow " - Script halted!"
-        If ($_.FullyQualifiedErrorId -ne $null -and $_.FullyQualifiedErrorId.StartsWith(" - "))
+        If ($null -ne $_.FullyQualifiedErrorId -and $_.FullyQualifiedErrorId.StartsWith(" - "))
         {
             # Error messages starting with " - " are thrown directly from this script
             Write-Host -ForegroundColor Red $_.FullyQualifiedErrorId
@@ -445,11 +455,11 @@ If (MatchComputerName $farmServers $env:COMPUTERNAME)
                 # Create the RunOnce key in case it doesn't yet exist (as I discovered on on Win2012)
                 New-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\" -Name RunOnce -ErrorAction SilentlyContinue | Out-Null
                 New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce" -Name AutoSPInstaller -Value "`"$env:dp0\AutoSPInstallerLaunch.bat`" `"$inputFile`"" -Force | Out-Null
-                If ($xmlinput.Configuration.Install.AutoAdminLogon.Enable -eq $true)
+                If ($xmlInput.Configuration.Install.AutoAdminLogon.Enable -eq $true)
                 {
                     If ([string]::IsNullOrEmpty($password))
                     {
-                        $password = $xmlinput.Configuration.Install.AutoAdminLogon.Password
+                        $password = $xmlInput.Configuration.Install.AutoAdminLogon.Password
                         If ([string]::IsNullOrEmpty($password))
                         {
                             $password = Read-Host -Prompt " - Please enter the password for $env:USERDOMAIN\$env:USERNAME to enable auto-login"
@@ -530,21 +540,20 @@ If (MatchComputerName $farmServers $env:COMPUTERNAME)
         If ((Confirm-LocalSession) -and !$aborted -and !($enableRemoteInstall))
         {
             # Launch Central Admin
-            If (ShouldIProvision($xmlinput.Configuration.Farm.CentralAdmin) -eq $true)
+            If (ShouldIProvision($xmlInput.Configuration.Farm.CentralAdmin) -eq $true)
             {
-                $centralAdminPort = $xmlinput.Configuration.Farm.CentralAdmin.CentralAdminPort
                 Write-Host -ForegroundColor White " - Launching Central Admin..."
                 Start-Process $PSConfigUI -ArgumentList "-cmd showcentraladmin"
             }
             # Launch any site collections we created, but only if this is a local (non-remote) session and this is a farm server and the Foundation Web Application Service is not disabled
-            If ((MatchComputerName $farmServers $env:COMPUTERNAME) -and (ShouldIProvision $xmlinput.Configuration.Farm.Services.FoundationWebApplication))
+            If ((MatchComputerName $farmServers $env:COMPUTERNAME) -and (ShouldIProvision $xmlInput.Configuration.Farm.Services.FoundationWebApplication))
             {
-                ForEach ($webApp in $xmlinput.Configuration.WebApplications.WebApplication)
+                ForEach ($webApp in $xmlInput.Configuration.WebApplications.WebApplication)
                 {
                     ForEach ($siteCollection in $webApp.SiteCollections.SiteCollection)
                     {
                         $siteURL = $siteCollection.siteURL
-                        If ($siteURL -ne $null)
+                        If ($null -ne $siteURL)
                         {
                             Start-Sleep 30 # Wait for the previous site to load before trying to load this site
                             Write-Host -ForegroundColor White " - Launching $siteURL..."
@@ -560,27 +569,27 @@ If (MatchComputerName $farmServers $env:COMPUTERNAME)
 Else ##If (!($farmServers -like "$env:COMPUTERNAME*"))
 {
     Install-Remote
-    Finalize-Install
+    Complete-Install
 }
 If (!$aborted)
 {
-	If (Confirm-LocalSession) # Only do this stuff if this was a local session and it succeeded
-	{
-		$startDate = $env:StartDate
-	    Write-Host -ForegroundColor White "-----------------------------------"
-	    Write-Host -ForegroundColor White "| Automated SP$spYear install script |"
-	    Write-Host -ForegroundColor White "| Started on: $startDate |"
-	    Write-Host -ForegroundColor White "| Completed:  $env:EndDate |"
-	    Write-Host -ForegroundColor White "-----------------------------------"
-	    If ($isTracing) {Stop-Transcript; $script:isTracing = $false}
-	    Pause "exit"
-	    If ((-not $unattended) -and (-not (Gwmi Win32_OperatingSystem).Version -eq "6.1.7601")) {Invoke-Item $logFile} # We don't want to automatically open the log Win 2008 with SP2013, due to a nasty bug causing BSODs! See https://autospinstaller.codeplex.com/workitem/19491 for more info.
-	}
-	# Remove any lingering LogTime values in the registry
-	Remove-ItemProperty -Path "HKLM:\SOFTWARE\AutoSPInstaller\" -Name "LogTime" -ErrorAction SilentlyContinue
+    If (Confirm-LocalSession) # Only do this stuff if this was a local session and it succeeded
+    {
+        $startDate = $env:StartDate
+        Write-Host -ForegroundColor White "-----------------------------------"
+        Write-Host -ForegroundColor White "| Automated SP$spYear install script |"
+        Write-Host -ForegroundColor White "| Started on: $startDate |"
+        Write-Host -ForegroundColor White "| Completed:  $env:EndDate |"
+        Write-Host -ForegroundColor White "-----------------------------------"
+        If ($isTracing) {Stop-Transcript; $script:isTracing = $false}
+        Pause "exit"
+        If ((-not $unattended) -and (-not (Get-CimInstance -ClassName Win32_OperatingSystem).Version -eq "6.1.7601")) {Invoke-Item $logFile} # We don't want to automatically open the log Win 2008 with SP2013, due to a nasty bug causing BSODs! See https://autospinstaller.codeplex.com/workitem/19491 for more info.
+    }
+    # Remove any lingering LogTime values in the registry
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\AutoSPInstaller\" -Name "LogTime" -ErrorAction SilentlyContinue
 }
 
-#EndRegion
+#endregion
 
 # ===================================================================================
 # LOAD ASSEMBLIES
