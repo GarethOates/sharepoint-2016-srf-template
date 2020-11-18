@@ -19,7 +19,7 @@
 
 - name: Create c:\SP directory
   win_file:
-    path: C:\SP\prerequisiteinstallerfiles
+    path: C:\SP
     state: directory
 
 - name: Copy SP folder (SPAutoInstaller folder structure)
