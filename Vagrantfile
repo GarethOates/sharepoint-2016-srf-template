@@ -51,12 +51,10 @@ Vagrant.configure(2) do |config|
       cfg.windows.halt_timeout = 35
       cfg.vm.boot_timeout = 800
 
-
       cfg.vm.network "private_network", ip: ip_address
       cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
       cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
       cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
-      cfg.vm.network :forwarded_port, guest: 2016, host: 2016, id: "spadmin", auto_correct: true
 
       if box
         cfg.vm.box = box
@@ -94,9 +92,11 @@ Vagrant.configure(2) do |config|
             end
 
         elsif ARGV[1].start_with?('SharePoint')
+          cfg.vm.network :forwarded_port, guest: 2016, host: 2016, id: "spadmin"
+
           cfg.vm.provision :ansible do |ansible|
             ansible.limit = "Webservers"
-            ansible.playbook = "ansible/plays/webservers.yml"
+            ansible.playbook = "ansible/plays/sharepoint.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
             ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
             ansible.extra_vars = {

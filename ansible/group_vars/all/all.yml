@@ -2,8 +2,8 @@
 domain: "vmsak-dev.no"
 network: "10.0.2.15"
 netbios: "VMSAK-DEV"
-
 dns_server: "192.168.2.18"
+
 domain_vagrant_user: "{{ ansible_user }}@{{ domain }}"
 domain_vagrant_password: Pass@word1!
 
@@ -11,6 +11,12 @@ domain_admin_user: "administrator@{{ domain }}"
 domain_admin_password: Pass@word1!
 
 sys_admin_account: "{{ domain }}\\{{ ansible_user }}"
+
+farm_password: "Pass@word1!"
+services_password: "Pass@word1!"
+portalapppool_password: "Pass@word1!"
+search_service_password: "Pass@word1!"
+search_content_password: "Pass@word1!"
 
 ansible_user: vagrant
 ansible_password: vagrant

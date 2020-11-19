@@ -24,9 +24,14 @@
 
 - name: Copy SP folder (SPAutoInstaller folder structure)
   win_copy:
-    src: '../../common/files/SP/'
+    src: 'SP/'
     dest: 'C:\SP'
     force: no
+
+- name: Copy AutoSPInstallerInput.xml File
+  win_template:
+    src: AutoSPInstallerInput.xml.j2
+    dest: 'C:\SP\2016\AutoSPInstaller\AutoSPInstallerInput.xml'
 
 - name: Copy SP Bits to SPAutoInstaller folder structure
   win_copy:
@@ -71,7 +76,7 @@
     - "http://download.microsoft.com/download/1/C/A/1CAA41C7-88B9-42D6-9E11-3C655656DAB1/WcfDataServices.exe" # Microsoft WCF Data Services 5.6
 
 - name: Install SharePoint Prerequisites via PowerShell
-  script: ../../common/files/Install-Prerequisites.ps1 -SharePointBitsPath {{SharePointBitsPath}}
+  script: Install-Prerequisites.ps1 -SharePointBitsPath {{SharePointBitsPath}}
 
 - name: Reboot after Installing Prerequisites
   win_reboot:

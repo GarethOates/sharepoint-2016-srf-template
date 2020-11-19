@@ -9,7 +9,7 @@ DomainControllers:
   providers: virtualbox
 
 Webservers:
-  name: WFE1
+  name: SharePoint1
   box: garethoates/spfarm_base_windows2016
   hostname: VERGE-DWEB01
   role: Front-End
@@ -23,7 +23,7 @@ Databases:
   box: garethoates/spfarm_base_windows2016
   hostname: VERGE-DDB01
   role: Database
-  memory: 2048
+  memory: 4096
   default: false
   ip_address: 192.168.2.17
   providers: virtualbox
