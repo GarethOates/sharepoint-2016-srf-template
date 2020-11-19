@@ -1,9 +1,0 @@
----
-- name: appservers.yml | All roles
-  hosts: AppServers
-
-  roles:
-  #- { role: common,         tags: ["common"] }
-  # - { role: ansible-nginx, tags: ["nginx"] }
-    - { role: AppServer,     tags: ["SharePoint 2016","AppServer"] }
-

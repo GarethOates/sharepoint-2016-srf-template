@@ -1,17 +1,17 @@
 DomainControllers:
   name: DomainController1
   box: garethoates/spfarm_base_windows2016
-  hostname: SP2012R2AD
+  hostname: VERGE-DAD01
   role: DomainController
   memory: 1048
   default: true
-  ip_address: 192.168.2.19
+  ip_address: 192.168.2.18
   providers: virtualbox
 
 Webservers:
   name: WFE1
   box: garethoates/spfarm_base_windows2016
-  hostname: SP2016WFE
+  hostname: VERGE-DWEB01
   role: Front-End
   memory: 2048
   default: false
@@ -21,19 +21,9 @@ Webservers:
 Databases:
   name: Database1
   box: garethoates/spfarm_base_windows2016
-  hostname: SP2016SQLSERVER
+  hostname: VERGE-DDB01
   role: Database
   memory: 2048
   default: false
   ip_address: 192.168.2.17
-  providers: virtualbox
-
-AppServers:
-  name: AppServer1
-  box: garethoates/spfarm_base_windows2016
-  hostname: SP2016APPSERVER
-  role: Application
-  memory: 2048
-  default: false
-  ip_address: 192.168.2.18
   providers: virtualbox

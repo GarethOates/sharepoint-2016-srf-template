@@ -1,16 +1,16 @@
 - name: Setup DNS Server to point to DC
   win_dns_client:
     adapter_names: "Ethernet 2"
-    ipv4_addresses: "192.168.2.19"
+    ipv4_addresses: "{{ dns_server }}"
   tags:
     - join-to-domain
 
-- name: Join Database to Domain Controller
+- name: Join Server to Domain Controller
   win_domain_membership:
       dns_domain_name: "{{domain}}"
-      hostname: "SP2016SQLSERVER"
-      domain_admin_user: "administrator@sposcar.local"
-      domain_admin_password: "Pass@word1!"
+      hostname: "{{ cloud_host }}"
+      domain_admin_user: "administrator@{{ domain }}"
+      domain_admin_password: "{{ domain_admin_password }}"
       state: domain
   register: domain_state
   tags:

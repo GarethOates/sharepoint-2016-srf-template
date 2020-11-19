@@ -4,6 +4,4 @@
   hosts: Webservers
 
   roles:
-   #- { role: common,        tags: ["common"] }
-   #- { role: ansible-nginx, tags: ["nginx"] }
-    - { role: "WFE",         tags: ["SharePoint 2016","WFE"] }
+    - { role: "WFE", tags: ["SharePoint 2016","WFE"] }

@@ -1,28 +1,21 @@
 DomainControllers:
    hosts:
      DomainController1:
-       ansible_ssh_host: 192.168.2.19
+       ansible_ssh_host: 192.168.2.18
        ansible_user: vagrant
        ansible_password: vagrant
-       hostname: SP2012R2AD
+       hostname: VERGE-DAD01
 Webservers:
    hosts:
      WFE1:
        ansible_ssh_host: 192.168.2.16
        ansible_user: vagrant
        ansible_password: vagrant
-       hostname: SP2016WFE
+       hostname: VERGE-DWEB01
 Databases:
    hosts:
      Database1:
        ansible_ssh_host: 192.168.2.17
        ansible_user: vagrant
        ansible_password: vagrant
-       hostname: SP2016SQLSERVER
-AppServers:
-   hosts:
-     AppServer1:
-       ansible_ssh_host: 192.168.2.18
-       ansible_user: vagrant
-       ansible_password: vagrant
-       hostname: SP2016APPSERVER
+       hostname: VERGE-DDB01

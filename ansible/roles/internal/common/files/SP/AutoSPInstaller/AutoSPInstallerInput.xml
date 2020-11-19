@@ -1,4 +1,4 @@
-﻿<Configuration Environment="Test Environment" Version="3.99.70">
+﻿<Configuration Environment="Test" Version="3.99.70">
     <Install SPVersion="2016">
         <ConfigFile>config-AutoSPInstaller.xml</ConfigFile>
         <InstallDir></InstallDir>
@@ -17,7 +17,7 @@
             <LoopbackCheck>true</LoopbackCheck>
             <UnusedServices>true</UnusedServices>
             <IEEnhancedSecurity>true</IEEnhancedSecurity>
-            <CertificateRevocationListCheck>false</CertificateRevocationListCheck>
+            <CertificateRevocationListCheck>true</CertificateRevocationListCheck>
         </Disable>
     </Install>
     <Farm>
@@ -28,46 +28,46 @@
             <Username>SPOSCAR\SP_Farm</Username>
             <Password>Pass@word1!</Password>
         </Account>
-        <CentralAdmin Provision="SP2016APPSERVER">
+        <CentralAdmin Provision="localhost">
             <Database>Content_CentralAdmin</Database>
             <Port>2016</Port>
             <UseSSL>false</UseSSL>
         </CentralAdmin>
         <Database>
-            <DBServer>SP2016SQLSERVER</DBServer>
+            <DBServer>SPSQL</DBServer>
             <SQLAuthentication Enable="false">
                 <SQLUserName></SQLUserName>
                 <SQLPassword></SQLPassword>
             </SQLAuthentication>
-            <DBAlias Create="false">
+            <DBAlias Create="true">
                 <DBInstance>SP2016SQLSERVER</DBInstance>
                 <DBPort></DBPort>
             </DBAlias>
-            <DBPrefix>DEV</DBPrefix>
+            <DBPrefix>SP2016</DBPrefix>
             <ConfigDB>Config</ConfigDB>
         </Database>
         <Services>
-            <SandboxedCodeService Start="false"/>
-            <ClaimsToWindowsTokenService Start="false" UpdateAccount="false"/>
+            <SandboxedCodeService Start="localhost"/>
+            <ClaimsToWindowsTokenService Start="localhost" UpdateAccount="true"/>
             <SMTP Install="false"/>
             <OutgoingEmail Configure="false">
                 <SMTPServer></SMTPServer>
                 <EmailAddress></EmailAddress>
                 <ReplyToEmail></ReplyToEmail>
             </OutgoingEmail>
-            <IncomingEmail Start="false"/>
-            <DistributedCache Start="false"/>
-            <WorkflowTimer Start="false"/>
-            <FoundationWebApplication Start="false"/>
+            <IncomingEmail Start="localhost"/>
+            <DistributedCache Start="localhost"/>
+            <WorkflowTimer Start="localhost"/>
+            <FoundationWebApplication Start="localhost"/>
         </Services>
         <ServerRoles>
             <Custom Provision="false"/>
             <WebFrontEnd Provision="false"/>
-            <WebFrontEndWithDistributedCache Provision="SP2016WFE1"/>
-            <SingleServerFarm Provision="false"/>
+            <WebFrontEndWithDistributedCache Provision="false"/>
+            <SingleServerFarm Provision="localhost"/>
             <Search Provision="false"/>
             <Application Provision="false"/>
-            <ApplicationWithSearch Provision="SP2016APPSERVER"/>
+            <ApplicationWithSearch Provision="false"/>
             <DistributedCache Provision="false"/>
         </ServerRoles>
         <ManagedAccounts>
@@ -77,10 +77,6 @@
             </ManagedAccount>
             <ManagedAccount CommonName="Portal">
                 <Username>SPOSCAR\SP_PortalAppPool</Username>
-                <Password>Pass@word1!</Password>
-            </ManagedAccount>
-            <ManagedAccount CommonName="MySiteHost">
-                <Username>SPOSCAR\SP_ProfilesAppPool</Username>
                 <Password>Pass@word1!</Password>
             </ManagedAccount>
             <ManagedAccount CommonName="SearchService">
@@ -110,51 +106,10 @@
         </Logging>
     </Farm>
     <WebApplications AddURLsToHOSTS="true">
-        <WebApplication Name="Portal Home">
+        <WebApplication Name="Verge">
             <Type>Portal</Type>
-            <ApplicationPool>portal.sharepointoscar.com</ApplicationPool>
-            <Url>http://portal.sharepointoscar.com</Url>
-            <Port>80</Port>
-            <UseHostHeader>false</UseHostHeader>
-            <AddURLToLocalIntranetZone>true</AddURLToLocalIntranetZone>
-            <GrantCurrentUserFullControl>true</GrantCurrentUserFullControl>
-            <UseClaims>true</UseClaims>
-            <UseBasicAuthentication>false</UseBasicAuthentication>
-            <UseOnlineWebPartCatalog>false</UseOnlineWebPartCatalog>
-            <Database>
-                <Name>Content_Portal</Name>
-                <DBServer></DBServer>
-                <SQLAuthentication UseFarmSetting="true">
-                    <SQLUserName></SQLUserName>
-                    <SQLPassword></SQLPassword>
-                </SQLAuthentication>
-                <DBAlias Create="false">
-                    <DBInstance></DBInstance>
-                    <DBPort></DBPort>
-                </DBAlias>
-            </Database>
-            <ManagedPaths>
-                <ManagedPath relativeUrl="help" explicit="true"/>
-            </ManagedPaths>
-            <SiteCollections>
-                <SiteCollection siteUrl="http://portal.sharepointoscar.com">
-                    <Name>Portal Home</Name>
-                    <Description>Portal Home Site</Description>
-                    <HostNamedSiteCollection>false</HostNamedSiteCollection>
-                    <Owner></Owner>
-                    <CustomDatabase>sposcar_portal_content</CustomDatabase>
-                    <SearchUrl>http://portal.sharepointoscar.com/search</SearchUrl>
-                    <Template>BLANKINTERNETCONTAINER#0</Template>
-                    <LCID>1033</LCID>
-                    <Locale>en-us</Locale>
-                    <Time24>false</Time24>
-                </SiteCollection>
-            </SiteCollections>
-        </WebApplication>
-        <WebApplication Name="MySite Host">
-            <Type>MySiteHost</Type>
-            <ApplicationPool>mysites.sharepointoscar.com</ApplicationPool>
-            <Url>http://mysites.sharepointoscar.com</Url>
+            <ApplicationPool>SharePoint</ApplicationPool>
+            <Url>http://verge</Url>
             <Port>80</Port>
             <UseHostHeader>true</UseHostHeader>
             <AddURLToLocalIntranetZone>true</AddURLToLocalIntranetZone>
@@ -163,7 +118,7 @@
             <UseBasicAuthentication>false</UseBasicAuthentication>
             <UseOnlineWebPartCatalog>false</UseOnlineWebPartCatalog>
             <Database>
-                <Name>Content_MySites</Name>
+                <Name>Verge</Name>
                 <DBServer></DBServer>
                 <SQLAuthentication UseFarmSetting="true">
                     <SQLUserName></SQLUserName>
@@ -174,27 +129,25 @@
                     <DBPort></DBPort>
                 </DBAlias>
             </Database>
-            <ManagedPaths>
-                <ManagedPath relativeUrl="personal" explicit="false"/>
-            </ManagedPaths>
+            <ManagedPaths/>
             <SiteCollections>
-                <SiteCollection siteUrl="http://mysites.sharepointoscar.com">
-                    <Name>My Site Host</Name>
-                    <Description>My Site Host</Description>
+                <SiteCollection siteUrl="http://verge">
+                    <Name>Verge</Name>
+                    <Description></Description>
                     <HostNamedSiteCollection>false</HostNamedSiteCollection>
                     <Owner></Owner>
-                    <CustomDatabase></CustomDatabase>
-                    <SearchUrl>http://portal.sharepointoscar.com/search</SearchUrl>
-                    <Template>SPSMSITEHOST#0</Template>
-                    <LCID>1033</LCID>
-                    <Locale>en-us</Locale>
-                    <Time24>false</Time24>
+                    <CustomDatabase>contentVerge</CustomDatabase>
+                    <SearchUrl></SearchUrl>
+                    <Template>STS#1</Template>
+                    <LCID>1044</LCID>
+                    <Locale></Locale>
+                    <Time24>true</Time24>
                 </SiteCollection>
             </SiteCollections>
         </WebApplication>
     </WebApplications>
     <ServiceApps>
-        <ManagedMetadataServiceApp Provision="SP2016APPSERVER">
+        <ManagedMetadataServiceApp Provision="localhost">
             <Name>Managed Metadata Service</Name>
             <ProxyName>Managed Metadata Service</ProxyName>
             <Database>
@@ -210,7 +163,7 @@
                 </DBAlias>
             </Database>
         </ManagedMetadataServiceApp>
-        <UserProfileServiceApp Provision="SP2016APPSERVER">
+        <UserProfileServiceApp Provision="false">
             <Name>User Profile Service Application</Name>
             <ProxyName>User Profile Service Application</ProxyName>
             <MySiteHostLocation></MySiteHostLocation>
@@ -235,7 +188,7 @@
                 </DBAlias>
             </Database>
         </UserProfileServiceApp>
-        <EnterpriseSearchService Provision="SP2016APPSERVER">
+        <EnterpriseSearchService Provision="localhost">
             <ContactEmail></ContactEmail>
             <ConnectionTimeout>60</ConnectionTimeout>
             <AcknowledgementTimeout>60</AcknowledgementTimeout>
@@ -266,15 +219,15 @@
                         </DBAlias>
                     </Database>
                     <ApplicationPool Name="SharePoint Search Application Pool"/>
-                    <CrawlComponent Provision="SP2016APPSERVER"/>
-                    <QueryComponent Provision="SP2016APPSERVER"/>
-                    <SearchQueryAndSiteSettingsComponent Provision="SP2016APPSERVER"/>
-                    <AdminComponent Provision="SP2016APPSERVER">
+                    <CrawlComponent Provision="localhost"/>
+                    <QueryComponent Provision="localhost"/>
+                    <SearchQueryAndSiteSettingsComponent Provision="localhost"/>
+                    <AdminComponent Provision="localhost">
                         <ApplicationPool Name="SharePoint Search Application Pool"/>
                     </AdminComponent>
                     <IndexComponent Provision="localhost"/>
-                    <ContentProcessingComponent Provision="SP2016APPSERVER"/>
-                    <AnalyticsProcessingComponent Provision="SP2016APPSERVER"/>
+                    <ContentProcessingComponent Provision="localhost"/>
+                    <AnalyticsProcessingComponent Provision="localhost"/>
                     <Proxy Name="Search Service Application">
                         <Partitioned>false</Partitioned>
                         <ProxyGroup>Default</ProxyGroup>
@@ -283,7 +236,7 @@
                 </EnterpriseSearchServiceApplication>
             </EnterpriseSearchServiceApplications>
         </EnterpriseSearchService>
-        <StateService Provision="SP2016APPSERVER">
+        <StateService Provision="localhost">
             <Name>State Service</Name>
             <ProxyName>State Service</ProxyName>
             <Database>
@@ -315,7 +268,7 @@
                 </DBAlias>
             </Database>
         </WebAnalyticsService>
-        <SPUsageService Provision="false">
+        <SPUsageService Provision="localhost">
             <Name>Usage and Health Data Collection</Name>
             <Database>
                 <Name>UsageAndHealth</Name>
@@ -330,7 +283,7 @@
                 </DBAlias>
             </Database>
         </SPUsageService>
-        <SecureStoreService Provision="SP2016APPSERVER">
+        <SecureStoreService Provision="localhost">
             <Name>Secure Store Service</Name>
             <ProxyName>Secure Store Service</ProxyName>
             <Database>
@@ -378,7 +331,7 @@
                 </DBAlias>
             </Database>
         </WordAutomationService>
-        <AppManagementService Provision="SP2016APPSERVER">
+        <AppManagementService Provision="false">
             <Name>App Management Service</Name>
             <ProxyName>App Management Service</ProxyName>
             <AppDomain>apps.sharepointoscar.com</AppDomain>
@@ -395,7 +348,7 @@
                 </DBAlias>
             </Database>
         </AppManagementService>
-        <SubscriptionSettingsService Provision="SP2016APPSERVER">
+        <SubscriptionSettingsService Provision="false">
             <Name>Subscription Settings Service</Name>
             <AppSiteSubscriptionName>app</AppSiteSubscriptionName>
             <Database>
@@ -415,7 +368,7 @@
             <Name>Work Management Service Application</Name>
             <ProxyName>Work Management Service Application</ProxyName>
         </WorkManagementService>
-        <MachineTranslationService Provision="SP2016APPSERVER">
+        <MachineTranslationService Provision="false">
             <Name>Machine Translation Service</Name>
             <ProxyName>Machine Translation Service</ProxyName>
             <Database>

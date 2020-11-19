@@ -31,8 +31,8 @@
   win_group_membership:
     name: Administrators
     members:
-      - SPOSCAR\SP_FARM
-      - SPOSCAR\administrator
+      - "{{ netbios }}\\SP_FARM"
+      - "{{ netbios }}\\administrator"
     state: present
   register: domainusers
 
@@ -49,16 +49,16 @@
   - vagrant-environment
 
 - name: Copy SQL Server ConfigurationFile to C:\
-  win_copy:
-    src: ../roles/internal/Database/files/ConfigurationFile.ini
+  win_template:
+    src: ../roles/internal/Database/templates/ConfigurationFile.ini.j2
     dest: c:\ConfigurationFile.ini
   tags:
   - vagrant-environment
 
 - name: Mount SQL Server ISO Image
   win_disk_image:
-   image_path: C:\SQLServer2014-x64-ENU.iso
-   state: present
+    image_path: C:\SQLServer2014-x64-ENU.iso
+    state: present
   register: disk_image_out
   tags:
   - vagrant-environment
@@ -76,8 +76,3 @@
     executable: cmd
   tags:
   - vagrant-environment
-
-# - name: Add SPOSCAR\vagrant to SysAdmin SQL Role (return 0 = success)
-#   win_shell: sqlcmd -S SP2016SQLSERVER -U {{domain_admin_user}} -P {{domain_admin_password}} -Q "EXEC sp_addsrvrolemember 'SPOSCAR\vagrant', 'sysadmin';"
-#   tags:
-#   - all-environments

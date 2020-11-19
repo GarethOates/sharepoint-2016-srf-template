@@ -9,7 +9,7 @@
 - name: Set Administrator Password
   win_user:
       name: Administrator
-      password: Pass@word1!
+      password: "{{ domain_admin_password }}"
   tags:
     - create-domain
 
@@ -32,12 +32,12 @@
 
 - name: Create new Windows domain in a new forest
   win_domain:
-    safe_mode_password: Pass@word1!
+    safe_mode_password: "{{ domain_admin_password }}"
     create_dns_delegation: no
     database_path: C:\Windows\NTDS
     domain_mode: Win2012R2
-    dns_domain_name: sposcar.local
-    domain_netbios_name: SPOSCAR
+    dns_domain_name: "{{ domain }}"
+    domain_netbios_name: "{{ netbios }}"
     forest_mode: Win2012R2
     install_dns: yes
     log_path: C:\Windows\NTDS

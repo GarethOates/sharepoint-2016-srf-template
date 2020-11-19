@@ -88,14 +88,20 @@ Vagrant.configure(2) do |config|
               ansible.playbook = "ansible/plays/domaincontroller.yml"
               ansible.inventory_path = "ansible/hosts_dev_env.yaml"
               ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+              ansible.extra_vars = {
+                "cloud_host" => "#{machine[1]['hostname']}"
+              }
             end
 
-        elsif ARGV[1].start_with?('WFE')
+        elsif ARGV[1].start_with?('SharePoint')
           cfg.vm.provision :ansible do |ansible|
             ansible.limit = "Webservers"
             ansible.playbook = "ansible/plays/webservers.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
             ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+            ansible.extra_vars = {
+              "cloud_host" => "#{machine[1]['hostname']}"
+            }
           end
 
         elsif ARGV[1].start_with?('Database')
@@ -104,16 +110,18 @@ Vagrant.configure(2) do |config|
             ansible.playbook = "ansible/plays/databaseservers.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
             ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+            ansible.extra_vars = {
+              "cloud_host" => "#{machine[1]['hostname']}"
+            }
           end
 
-        elsif ARGV[1].start_with?('AppServer')
-          cfg.vm.provision :ansible do |ansible|
-            ansible.limit = "AppServers"
-            ansible.playbook = "ansible/plays/appservers.yml"
-            ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-            ansible.verbose = "vvvv"
-            ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-          end
+        # elsif ARGV[1].start_with?('AppServer')
+        #   cfg.vm.provision :ansible do |ansible|
+        #     ansible.limit = "AppServers"
+        #     ansible.playbook = "ansible/plays/appservers.yml"
+        #     ansible.inventory_path = "ansible/hosts_dev_env.yaml"
+        #     ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
+        #   end
         end
       end
     end

@@ -8,9 +8,9 @@
     name: "{{ item }}"
     password: Pass@word1!
     state: present
-    upn: "{{ item }}@sposcar.local"
+    upn: "{{ item }}@{{ domain }}"
     domain_password: "Pass@word1!"
-    domain_username: "Administrator@sposcar.local"
+    domain_username: "Administrator@{{ domain }}"
   with_items:
     - SP_Admin
     - SP_CacheSuperReader
@@ -27,17 +27,17 @@
     - SP_Services
     - SP_VisioUser
 
-- name: Add Admin Account to Domain Admins
+- name: Add Vagrant Account to Domain Admins
   win_domain_user:
     name: vagrant
     firstname: Vagrant
     surname: Account
-    upn: vagrant@sposcar.local
-    password: Pass@word1!
+    upn: "{{ domain_vagrant_user }}"
+    password: "{{ domain_vagrant_password }}"
     password_never_expires: yes
     account_locked: no
-    domain_password: "Pass@word1!"
-    domain_username: "Administrator@sposcar.local"
+    domain_username: "{{ domain_admin_user }}"
+    domain_password: "{{ domain_admin_password }}"
     state: present
     groups_action: add
     groups:
