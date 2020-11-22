@@ -30,6 +30,7 @@ stages:
         displayName: Initialize Terraform
         inputs:
           command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
           backendType: 'azurerm'
           backendServiceArm: 'Azure-QA'
           ensureBackend: true
@@ -38,12 +39,15 @@ stages:
           backendAzureRmStorageAccountName: '$(storage_account_name)'
           backendAzureRmContainerName: '$(container_name)'
           backendAzureRmKey: '$(key)'
+          allowTelemetryCollection: true
 
       - task: TerraformCLI@0
         displayName: Terraform Plan
         inputs:
           command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
           environmentServiceName: 'Azure-QA'
+          allowTelemetryCollection: true
 
       - task: CopyFiles@2
         inputs:
