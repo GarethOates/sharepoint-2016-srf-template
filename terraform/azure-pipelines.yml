@@ -1,0 +1,102 @@
+name: $(BuildDefinitionName).$(Build.SourceBranchName)$(Rev:.r)
+trigger:
+  branches:
+    include:
+      - master
+
+variables:
+  location: "northeurope"
+
+stages:
+- stage: PlanQA
+  displayName: QA - Plan
+  pool:
+    vmImage: ubuntu-latest
+  variables:
+    resource_group: 'sp2016vera-terraform'
+    storage_account_name: 'sp2016veraterraform'
+    container_name: 'terraform'
+    key: 'state'
+  jobs:
+    - job: TerraformPlan
+
+      steps:
+      - task: TerraformInstaller@0
+        displayName: Use Terraform 0.13.4
+        inputs:
+          terraformVersion: '0.13.4'
+
+      - task: TerraformCLI@0
+        displayName: Initialize Terraform
+        inputs:
+          command: 'init'
+          backendType: 'azurerm'
+          backendServiceArm: 'Azure-QA'
+          ensureBackend: true
+          backendAzureRmResourceGroupName: '$(resource_group)'
+          backendAzureRmResourceGroupLocation: '$(location)'
+          backendAzureRmStorageAccountName: '$(storage_account_name)'
+          backendAzureRmContainerName: '$(container_name)'
+          backendAzureRmKey: '$(key)'
+
+      - task: TerraformCLI@0
+        displayName: Terraform Plan
+        inputs:
+          command: 'plan'
+          environmentServiceName: 'Azure-QA'
+
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: '$(System.DefaultWorkingDirectory)/terraform'
+          Contents: '**/*.tf'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+          artifact: 'plan'
+          publishLocation: 'pipeline'
+
+- stage: ApplyQA
+  displayName: QA - Apply
+  variables:
+    resource_group: 'sp2016vera-terraform'
+    storage_account_name: 'sp2016veraterraform'
+    container_name: 'terraform'
+    key: 'state'
+  pool:
+    vmImage: ubuntu-latest
+  jobs:
+    - deployment:
+      displayName: Apply Changes
+      environment: qa - Azure
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: TerraformInstaller@0
+                displayName: Use Terraform 0.13.4
+                inputs:
+                  terraformVersion: '0.13.4'
+
+              - task: TerraformCLI@0
+                displayName: Initialize Terraform
+                inputs:
+                  command: 'init'
+                  workingDirectory: '$(Pipeline.Workspace)/plan'
+                  backendType: 'azurerm'
+                  backendServiceArm: 'Azure-QA'
+                  ensureBackend: true
+                  backendAzureRmResourceGroupName: '$(resource_group)'
+                  backendAzureRmResourceGroupLocation: '$(location)'
+                  backendAzureRmStorageAccountName: '$(storage_account_name)'
+                  backendAzureRmContainerName: '$(container_name)'
+                  backendAzureRmKey: '$(key)'
+
+              - task: TerraformCLI@0
+                displayName: Apply Changes
+                inputs:
+                  command: 'apply'
+                  workingDirectory: '$(Pipeline.Workspace)/plan'
+                  environmentServiceName: 'Azure-QA'
+                  commandOptions: '-auto-approve'

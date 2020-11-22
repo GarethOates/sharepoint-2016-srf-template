@@ -7,7 +7,7 @@ DomainControllers:
        hostname: VERGE-DAD01
 Webservers:
    hosts:
-     WFE1:
+     SharePoint1:
        ansible_ssh_host: 192.168.2.16
        ansible_user: vagrant
        ansible_password: vagrant

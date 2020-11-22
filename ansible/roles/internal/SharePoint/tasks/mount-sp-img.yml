@@ -1,7 +1,10 @@
-- name: Install PSExec
+- name: Install PSExec and SharePoint Designer
   win_chocolatey:
-    name: psexec
+    name: "{{ item }}"
     ignore_checksums: yes
+  with_items:
+    - psexec
+    - sharepointdesigner2010x64
   ignore_errors: yes
 
 - name: Download SharePoint 2016
@@ -31,7 +34,7 @@
 - name: Copy AutoSPInstallerInput.xml File
   win_template:
     src: AutoSPInstallerInput.xml.j2
-    dest: 'C:\SP\2016\AutoSPInstaller\AutoSPInstallerInput.xml'
+    dest: 'C:\SP\AutoSPInstaller\AutoSPInstallerInput.xml'
 
 - name: Copy SP Bits to SPAutoInstaller folder structure
   win_copy:
@@ -95,10 +98,14 @@
   pause:
     minutes: "1"
 
+- name: Debug Show env
+  debug:
+    var: ansible_env
+
 - name: Find AutoSPInstall Log File
   win_find:
     paths:
-      - C:\Users\vagrant.SPOSCAR\Desktop
+      - "C:\\Users\\{{ ansible_user }}.{{ netbios }}\\Desktop"
     patterns: ['*.log', '*.txt']
     get_checksum: no
   register: logs

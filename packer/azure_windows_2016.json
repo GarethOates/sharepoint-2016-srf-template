@@ -1,4 +1,4 @@
-{  
+{
   "variables": {},
 
   "builders": [{
@@ -6,7 +6,7 @@
     "client_secret": "{{user `client_secret`}}",
     "subscription_id": "{{user `subscription_id`}}",
     "tenant_id": "{{user `tenant_id`}}",
-    
+
     "type": "azure-arm",
     "managed_image_resource_group_name": "sp2016-vera",
     "managed_image_name": "spfarm2016",
