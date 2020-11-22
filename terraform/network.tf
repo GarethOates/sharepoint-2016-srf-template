@@ -32,7 +32,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-backend" {
         protocol                   = "Tcp"
         source_port_range          = "*"
         destination_port_range     = "22"
-        source_address_prefix      = "*"
+        source_address_prefix      = "62.101.249.219"
         destination_address_prefix = "*"
     }
 
@@ -44,7 +44,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-backend" {
         protocol                   = "Tcp"
         source_port_range          = "*"
         destination_port_range     = "5985"
-        source_address_prefix      = "*"
+        source_address_prefix      = "62.101.249.219"
         destination_address_prefix = "*"
     }
 
@@ -56,7 +56,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-backend" {
         protocol                   = "Tcp"
         source_port_range          = "*"
         destination_port_range     = "3389"
-        source_address_prefix      = "*"
+        source_address_prefix      = "62.101.249.219"
         destination_address_prefix = "*"
     }
 }
@@ -74,7 +74,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-frontend" {
         protocol                   = "Tcp"
         source_port_range          = "*"
         destination_port_range     = "22"
-        source_address_prefix      = "*"
+        source_address_prefix      = "62.101.249.219"
         destination_address_prefix = "*"
     }
 
@@ -86,7 +86,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-frontend" {
         protocol                   = "Tcp"
         source_port_range          = "*"
         destination_port_range     = "5985"
-        source_address_prefix      = "*"
+        source_address_prefix      = "62.101.249.219"
         destination_address_prefix = "*"
     }
 
@@ -98,7 +98,7 @@ resource "azurerm_network_security_group" "spfarm-security-group-frontend" {
         protocol                   = "Tcp"
         source_port_range          = "*"
         destination_port_range     = "3389"
-        source_address_prefix      = "*"
+        source_address_prefix      = "62.101.249.219"
         destination_address_prefix = "*"
     }
 }
