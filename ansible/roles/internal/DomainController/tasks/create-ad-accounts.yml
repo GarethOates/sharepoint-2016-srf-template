@@ -9,8 +9,8 @@
     password: Pass@word1!
     state: present
     upn: "{{ item }}@{{ domain }}"
-    domain_password: "Pass@word1!"
-    domain_username: "Administrator@{{ domain }}"
+    domain_username: "vagrant@{{ domain }}"
+    domain_password: "{{ domain_admin_password }}"
   with_items:
     - SP_Admin
     - SP_CacheSuperReader
@@ -36,7 +36,7 @@
     password: "{{ domain_vagrant_password }}"
     password_never_expires: yes
     account_locked: no
-    domain_username: "{{ domain_admin_user }}"
+    domain_username: "vagrant@{{ domain }}"
     domain_password: "{{ domain_admin_password }}"
     state: present
     groups_action: add

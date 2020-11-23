@@ -10,7 +10,7 @@ domain_vagrant_password: Pass@word1!
 domain_admin_user: "administrator@{{ domain }}"
 domain_admin_password: Pass@word1!
 
-sys_admin_account: "{{ domain }}\\{{ ansible_user }}"
+sys_admin_account: "{{ netbios }}\\{{ ansible_user }}"
 
 farm_password: "Pass@word1!"
 services_password: "Pass@word1!"

@@ -4,14 +4,15 @@
     ipv4_addresses: "{{ dns_server }}"
   tags:
     - join-to-domain
+    - vagrant-environment
 
 - name: Join Server to Domain Controller
   win_domain_membership:
-      dns_domain_name: "{{domain}}"
-      hostname: "{{ cloud_host }}"
-      domain_admin_user: "administrator@{{ domain }}"
-      domain_admin_password: "{{ domain_admin_password }}"
-      state: domain
+    dns_domain_name: "{{domain}}"
+    hostname: "{{ cloud_host }}"
+    domain_admin_user: "administrator@{{ domain }}"
+    domain_admin_password: "{{ domain_admin_password }}"
+    state: domain
   register: domain_state
   tags:
     - join-to-domain
@@ -21,5 +22,5 @@
   win_reboot:
   when: domain_state.reboot_required
   tags:
-  - join-to-domain
-  - all-environments
+    - join-to-domain
+    - all-environments

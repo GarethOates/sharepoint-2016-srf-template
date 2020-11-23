@@ -71,7 +71,7 @@
 
 #Run a command under a non-Powershell interpreter (cmd in this case)
 - name: Run SQL Server unattended setup command using ConfigurationFile
-  win_shell: D:\setup.exe /Q /ConfigurationFile=c:\ConfigurationFile.ini
+  win_shell: "{{ disk_image_out.mount_path}}setup.exe /Q /ConfigurationFile=c:\\ConfigurationFile.ini"
   args:
     executable: cmd
   tags:

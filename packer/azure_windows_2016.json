@@ -51,7 +51,8 @@
       "type": "powershell",
       "scripts": [
         "scripts/disable-screensaver.ps1",
-        "scripts/postInstall.ps1"
+        "scripts/postInstall.ps1",
+        "scripts/enable-winrm.ps1"
       ]
     },
     {
