@@ -15,8 +15,6 @@ resource "azurerm_virtual_machine" "spfarm_db1" {
     vm_size               = "Standard_DS2_v2"
     network_interface_ids = [azurerm_network_interface.spfarm-db1.id]
 
-    depends_on            = [azurerm_virtual_machine.spfarm_ad1]
-
     delete_os_disk_on_termination    = true
     delete_data_disks_on_termination = true
 

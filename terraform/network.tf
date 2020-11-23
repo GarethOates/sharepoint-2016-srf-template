@@ -19,95 +19,40 @@ resource "azurerm_subnet" "frontendsubnet" {
     resource_group_name  = azurerm_resource_group.sp2016rg.name
 }
 
-resource "azurerm_network_security_group" "spfarm-security-group-backend" {
-    name                = "spfarm-security-group-backend"
-    location            = azurerm_resource_group.sp2016rg.location
-    resource_group_name = azurerm_resource_group.sp2016rg.name
-
-    security_rule {
-        name                       = "SSH"
-        priority                   = 1001
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "22"
-        source_address_prefix      = "62.101.249.219"
-        destination_address_prefix = "*"
-    }
-
-    security_rule {
-        name                       = "WinRM"
-        priority                   = 1002
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "5985"
-        source_address_prefix      = "62.101.249.219"
-        destination_address_prefix = "*"
-    }
-
-    security_rule {
-        name                       = "RDP"
-        priority                   = 1003
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "3389"
-        source_address_prefix      = "62.101.249.219"
-        destination_address_prefix = "*"
-    }
+resource "azurerm_subnet" "gatewaysubnet" {
+    name                 = "GatewaySubnet"
+    address_prefixes     = ["10.10.3.0/24"]
+    virtual_network_name = azurerm_virtual_network.spfarmstaging-vnet.name
+    resource_group_name  = azurerm_resource_group.sp2016rg.name
 }
 
-resource "azurerm_network_security_group" "spfarm-security-group-frontend" {
-    name                = "spfarm-security-group-frontend"
-    location            = azurerm_resource_group.sp2016rg.location
-    resource_group_name = azurerm_resource_group.sp2016rg.name
-
-    security_rule {
-        name                       = "SSH"
-        priority                   = 1001
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "22"
-        source_address_prefix      = "62.101.249.219"
-        destination_address_prefix = "*"
-    }
-
-    security_rule {
-        name                       = "WinRM"
-        priority                   = 1002
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "5985"
-        source_address_prefix      = "62.101.249.219"
-        destination_address_prefix = "*"
-    }
-
-    security_rule {
-        name                       = "RDP"
-        priority                   = 1003
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "3389"
-        source_address_prefix      = "62.101.249.219"
-        destination_address_prefix = "*"
-    }
-}
-
-resource "azurerm_public_ip" "db1-public-ip" {
-    name                         = "db1-public-ip"
+resource "azurerm_public_ip" "gateway-public-ip" {
+    name                         = "GatewayPublicIp"
     location                     = azurerm_resource_group.sp2016rg.location
     resource_group_name          = azurerm_resource_group.sp2016rg.name
-    allocation_method            = "Static"
+    allocation_method            = "Dynamic"
+}
+
+resource "azurerm_virtual_network_gateway" "sharepointgateway" {
+    name                = "sharepointgateway"
+    location            = azurerm_resource_group.sp2016rg.location
+    resource_group_name = azurerm_resource_group.sp2016rg.name
+    type                = "Vpn"
+    sku                 = "VpnGw1"
+
+    ip_configuration {
+        subnet_id            = azurerm_subnet.gatewaysubnet.id
+        public_ip_address_id = azurerm_public_ip.gateway-public-ip.id
+    }
+
+    vpn_client_configuration {
+        address_space        = ["192.168.0.0/16"]
+        vpn_client_protocols = ["OpenVPN"]
+
+        aad_tenant           = format("https://login.microsoftonline.com/%s/", data.azurerm_client_config.current.tenant_id)
+        aad_audience         = "41b23e61-6c1e-4545-b367-cd054e0ed4b4"
+        aad_issuer           = format("https://sts.windows.net/%s/", data.azurerm_client_config.current.tenant_id)
+    }
 }
 
 resource "azurerm_network_interface" "spfarm-db1" {
@@ -119,22 +64,9 @@ resource "azurerm_network_interface" "spfarm-db1" {
     ip_configuration {
         name                          = "db1-ipconfiguration"
         subnet_id                     = azurerm_subnet.backendsubnet.id
-        public_ip_address_id          = azurerm_public_ip.db1-public-ip.id
         private_ip_address_allocation = "Static"
         private_ip_address            = "10.10.1.17"
     }
-}
-
-resource "azurerm_network_interface_security_group_association" "spfarm-db1-nsg-nic" {
-    network_interface_id      = azurerm_network_interface.spfarm-db1.id
-    network_security_group_id = azurerm_network_security_group.spfarm-security-group-backend.id
-}
-
-resource "azurerm_public_ip" "sharepoint-public-ip" {
-    name                         = "sharepoint-public-ip"
-    location                     = azurerm_resource_group.sp2016rg.location
-    resource_group_name          = azurerm_resource_group.sp2016rg.name
-    allocation_method            = "Static"
 }
 
 resource "azurerm_network_interface" "spfarm-sharepoint" {
@@ -147,20 +79,8 @@ resource "azurerm_network_interface" "spfarm-sharepoint" {
         name                                    = "sharepoint-ipconfiguration"
         subnet_id                               = azurerm_subnet.frontendsubnet.id
         private_ip_address_allocation           = "Static"
-        private_ip_address                      = "10.10.2.18"
+        private_ip_address                      = "10.10.2.19"
     }
-}
-
-resource "azurerm_network_interface_security_group_association" "spfarm-sharepoint-nsg-nic" {
-    network_interface_id      = azurerm_network_interface.spfarm-sharepoint.id
-    network_security_group_id = azurerm_network_security_group.spfarm-security-group-frontend.id
-}
-
-resource "azurerm_public_ip" "ad1-public-ip" {
-    name                         = "ad1-public-ip"
-    location                     = azurerm_resource_group.sp2016rg.location
-    resource_group_name          = azurerm_resource_group.sp2016rg.name
-    allocation_method            = "Static"
 }
 
 resource "azurerm_network_interface" "spfarm-ad1" {
@@ -171,13 +91,7 @@ resource "azurerm_network_interface" "spfarm-ad1" {
     ip_configuration {
         name                          = "AD1-ipconfiguration"
         subnet_id                     = azurerm_subnet.backendsubnet.id
-        public_ip_address_id          = azurerm_public_ip.ad1-public-ip.id
         private_ip_address_allocation = "Static"
         private_ip_address            = "10.10.1.18"
     }
-}
-
-resource "azurerm_network_interface_security_group_association" "spfarm-ad-nsg-nic" {
-    network_interface_id      = azurerm_network_interface.spfarm-ad1.id
-    network_security_group_id = azurerm_network_security_group.spfarm-security-group-backend.id
 }
