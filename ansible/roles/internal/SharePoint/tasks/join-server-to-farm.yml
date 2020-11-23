@@ -3,8 +3,6 @@
     src: ../../common/files/addServerToFarm.ps1
     dest: C:\SP\addServerToFarm.ps1
     force: false
-  tags:
-  - join-to-farm
 
 - name: Join Server to SharePoint 2016 Farm
   win_psexec:
@@ -15,5 +13,3 @@
     username: sposcar\vagrant
     password: Pass@word1!
     wait: no
-  tags:
-  - join-to-farm

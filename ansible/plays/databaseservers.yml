@@ -2,4 +2,4 @@
 - name: databaseservers.yml | All roles
   hosts: Databases
   roles:
-    - { role: Database, tags: ["SharePoint 2016","database"] }
+    - { role: Database}

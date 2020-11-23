@@ -1,7 +1,5 @@
 - name: Disable User Access Control UAC
   script: ../roles/internal/common/files/disable-uac.bat
-  tags:
-  - vagrant-environment
 
 - name: Install .NET Framework 3.5 (its required for database install)
   win_feature:
@@ -11,7 +9,7 @@
     include_sub_features: yes
     include_management_tools: yes
   tags:
-  - vagrant-environment
+  - local-only
 
 # open up firewall port 1433 for SQL to accept incoming connections.
 - name: Open port 1433 for remote connections to SQL Server
@@ -24,8 +22,6 @@
       profiles: domain,private,public
       state: present
       enabled: yes
-  tags:
-  - all-environments
 
 - name: Add Domain Users to Local Admins Group
   win_group_membership:
@@ -46,14 +42,14 @@
     dest: c:\SQLServer2014-x64-ENU.iso
     force: no
   tags:
-  - vagrant-environment
+  - local-only
 
 - name: Copy SQL Server ConfigurationFile to C:\
   win_template:
     src: ../roles/internal/Database/templates/ConfigurationFile.ini.j2
     dest: c:\ConfigurationFile.ini
   tags:
-  - vagrant-environment
+  - local-only
 
 - name: Mount SQL Server ISO Image
   win_disk_image:
@@ -61,13 +57,13 @@
     state: present
   register: disk_image_out
   tags:
-  - vagrant-environment
+  - local-only
 
 - name: Output debug info for path mount
   debug:
     msg: 'The path to SQL executable {{ disk_image_out.mount_path }}setup.exe'
   tags:
-  - vagrant-environment
+  - local-only
 
 #Run a command under a non-Powershell interpreter (cmd in this case)
 - name: Run SQL Server unattended setup command using ConfigurationFile
@@ -75,4 +71,4 @@
   args:
     executable: cmd
   tags:
-  - vagrant-environment
+  - local-only

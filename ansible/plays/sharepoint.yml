@@ -4,4 +4,4 @@
   hosts: Webservers
 
   roles:
-    - { role: "SharePoint", tags: ["SharePoint 2016","WFE"] }
+    - { role: "SharePoint"}

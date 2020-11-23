@@ -2,4 +2,4 @@
 - name: domaincontroller.yml | All roles
   hosts: DomainControllers
   roles:
-    - { role: DomainController, tags: ["Active Directory"] }
+    - { role: DomainController}

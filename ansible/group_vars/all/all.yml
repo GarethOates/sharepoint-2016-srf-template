@@ -1,6 +1,5 @@
 ---
 domain: "vmsak-dev.no"
-network: "10.0.2.15"
 netbios: "VMSAK-DEV"
 dns_server: "192.168.2.18"
 
