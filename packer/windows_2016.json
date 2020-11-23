@@ -47,8 +47,6 @@
       "disk_size": "{{user `disk_size`}}",
       "floppy_files": [
         "{{user `Autounattend_virtualbox`}}",
-        "floppy/WindowsPowershell.lnk",
-        "floppy/PinTo10.exe",
         "scripts/disable-screensaver.ps1",
         "scripts/disable-winrm.ps1",
         "scripts/enable-winrm.ps1",
@@ -89,7 +87,6 @@
       "type": "windows-shell",
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "scripts/pin-powershell.bat",
         "scripts/set-winrm-automatic.bat"
       ]
     },

@@ -11,6 +11,7 @@ domain_admin_password: Pass@word1!
 
 sys_admin_account: "{{ netbios }}\\{{ ansible_user }}"
 
+
 farm_password: "Pass@word1!"
 services_password: "Pass@word1!"
 portalapppool_password: "Pass@word1!"

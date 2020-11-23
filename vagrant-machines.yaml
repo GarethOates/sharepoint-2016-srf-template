@@ -5,7 +5,7 @@ DomainControllers:
   role: DomainController
   memory: 1048
   default: true
-  ip_address: 192.168.2.18
+  ip_address: 10.10.1.18
   providers: virtualbox
 
 Webservers:
@@ -15,7 +15,7 @@ Webservers:
   role: Front-End
   memory: 2048
   default: false
-  ip_address: 192.168.2.16
+  ip_address: 10.10.1.19
   providers: virtualbox
 
 Databases:
@@ -25,5 +25,5 @@ Databases:
   role: Database
   memory: 4096
   default: false
-  ip_address: 192.168.2.17
+  ip_address: 10.10.1.17
   providers: virtualbox

@@ -13,12 +13,12 @@ File.exists? "ansible/hosts_dev_env.yaml"
 File.open("ansible/hosts_dev_env.yaml" ,'w') do |f|
   machines.each do |machine|
     f.write "#{machine[0]}:\n"
-    f.write "   hosts:\n"
-    f.write "     #{machine[1]['name']}:\n"
-    f.write "       ansible_ssh_host: #{machine[1]['ip_address']}\n"
-    f.write "       ansible_user: vagrant\n"
-    f.write "       ansible_password: vagrant\n"
-    f.write "       hostname: #{machine[1]['hostname']}\n"
+    f.write "    hosts:\n"
+    f.write "        #{machine[1]['name']}:\n"
+    f.write "            ansible_ssh_host: #{machine[1]['ip_address']}\n"
+    f.write "            ansible_user: vagrant\n"
+    f.write "            ansible_password: vagrant\n"
+    f.write "            hostname: #{machine[1]['hostname']}\n"
   end
 end
 
@@ -54,7 +54,6 @@ Vagrant.configure(2) do |config|
       cfg.vm.network "private_network", ip: ip_address
       cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
       cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
-      cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
 
       if box
         cfg.vm.box = box
