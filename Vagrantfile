@@ -92,8 +92,6 @@ Vagrant.configure(2) do |config|
             end
 
         elsif ARGV[1].start_with?('SharePoint')
-          cfg.vm.network :forwarded_port, guest: 2016, host: 2016, id: "spadmin"
-
           cfg.vm.provision :ansible do |ansible|
             ansible.limit = "Webservers"
             ansible.playbook = "ansible/plays/sharepoint.yml"
@@ -114,14 +112,6 @@ Vagrant.configure(2) do |config|
               "cloud_host" => "#{machine[1]['hostname']}"
             }
           end
-
-        # elsif ARGV[1].start_with?('AppServer')
-        #   cfg.vm.provision :ansible do |ansible|
-        #     ansible.limit = "AppServers"
-        #     ansible.playbook = "ansible/plays/appservers.yml"
-        #     ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-        #     ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
-        #   end
         end
       end
     end

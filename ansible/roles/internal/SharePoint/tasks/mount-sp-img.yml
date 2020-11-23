@@ -98,10 +98,6 @@
   pause:
     minutes: "1"
 
-- name: Debug Show env
-  debug:
-    var: ansible_env
-
 - name: Find AutoSPInstall Log File
   win_find:
     paths:
