@@ -1,0 +1,418 @@
+<Configuration Environment="Test" Version="3.99.60">
+    <Install SPVersion="2016">
+        <ConfigFile>config-AutoSPInstaller.xml</ConfigFile>
+        <InstallDir></InstallDir>
+        <DataDir></DataDir>
+        <PIDKey>NWFM7-QVBRH-C4DR7-844BB-JK82F</PIDKey>
+        <SKU>Standard</SKU>
+        <OfflineInstall>false</OfflineInstall>
+        <PauseAfterInstall>true</PauseAfterInstall>
+        <RemoteInstall Enable="false">
+            <ParallelInstall>false</ParallelInstall>
+        </RemoteInstall>
+        <AutoAdminLogon Enable="true">
+            <Password>V3rgeSP!nstall</Password>
+        </AutoAdminLogon>
+        <Disable>
+            <LoopbackCheck>true</LoopbackCheck>
+            <UnusedServices>true</UnusedServices>
+            <IEEnhancedSecurity>true</IEEnhancedSecurity>
+            <CertificateRevocationListCheck>true</CertificateRevocationListCheck>
+        </Disable>
+    </Install>
+    <Farm>
+        <Passphrase>iwhgweiongJNHDGJO478539485</Passphrase>
+        <Account>
+            <AddToLocalAdminsDuringSetup>true</AddToLocalAdminsDuringSetup>
+            <LeaveInLocalAdmins>true</LeaveInLocalAdmins>
+            <Username>VMSAK_QA\srv_qa_shp_farm</Username>
+            <Password>V3rgeSP!nstall</Password>
+        </Account>
+        <CentralAdmin Provision="localhost">
+            <Database>Content_CentralAdmin</Database>
+            <Port>2013</Port>
+            <UseSSL>false</UseSSL>
+        </CentralAdmin>
+        <Database>
+            <DBServer>SPSQL</DBServer>
+            <DBAlias Create="true">
+                <DBInstance>VERGE-TDB02</DBInstance>
+                <DBPort>1433</DBPort>
+            </DBAlias>
+            <DBPrefix>SP2016</DBPrefix>
+            <ConfigDB>Config</ConfigDB>
+        </Database>
+        <Services>
+            <SandboxedCodeService Start="false"/>
+            <ClaimsToWindowsTokenService Start="localhost" UpdateAccount="true"/>
+            <SMTP Install="false"/>
+            <OutgoingEmail Configure="false">
+                <SMTPServer></SMTPServer>
+                <EmailAddress></EmailAddress>
+                <ReplyToEmail></ReplyToEmail>
+            </OutgoingEmail>
+            <IncomingEmail Start="localhost"/>
+            <DistributedCache Start="localhost"/>
+            <WorkflowTimer Start="localhost"/>
+            <FoundationWebApplication Start="localhost"/>
+        </Services>
+        <ServerRoles>
+            <Custom Provision="false"/>
+            <WebFrontEnd Provision="false"/>
+            <WebFrontEndWithDistributedCache Provision="false"/>
+            <SingleServerFarm Provision="localhost"/>
+            <Search Provision="false"/>
+            <Application Provision="false"/>
+            <ApplicationWithSearch Provision="false"/>
+            <DistributedCache Provision="false"/>
+        </ServerRoles>
+        <ManagedAccounts>
+            <ManagedAccount CommonName="spservice">
+                <Username>VMSAK_QA\srv_qa_shp_Service</Username>
+                <Password>LJfvH3Jcu13t</Password>
+            </ManagedAccount>
+            <ManagedAccount CommonName="Portal">
+                <Username>VMSAK_QA\srv_qa_shp_App01</Username>
+                <Password>oU8tqUQD6bZ6</Password>
+            </ManagedAccount>
+            <ManagedAccount CommonName="SearchService">
+                <Username>VMSAK_QA\srv_qa_shp_Search</Username>
+                <Password>rbngIY502Lbd</Password>
+            </ManagedAccount>
+        </ManagedAccounts>
+        <ObjectCacheAccounts>
+            <SuperUser>VMSAK_QA\srv_qa_shp_SuperU</SuperUser>
+            <SuperReader>VMSAK_QA\srv_qa_shp_SuperR</SuperReader>
+        </ObjectCacheAccounts>
+        <Logging>
+            <IISLogs Compress="true">
+                <Path></Path>
+            </IISLogs>
+            <ULSLogs Compress="true">
+                <LogLocation></LogLocation>
+                <LogDiskSpaceUsageGB>20</LogDiskSpaceUsageGB>
+                <DaysToKeepLogs>7</DaysToKeepLogs>
+                <LogCutInterval></LogCutInterval>
+            </ULSLogs>
+            <UsageLogs Compress="true">
+                <UsageLogDir></UsageLogDir>
+                <UsageLogMaxSpaceGB></UsageLogMaxSpaceGB>
+                <UsageLogCutTime></UsageLogCutTime>
+            </UsageLogs>
+        </Logging>
+    </Farm>
+    <WebApplications AddURLsToHOSTS="true">
+        <WebApplication Name="Verge">
+            <Type>Portal</Type>
+            <ApplicationPool>Sharepoint</ApplicationPool>
+            <Url>http://verge</Url>
+            <Port>80</Port>
+            <UseHostHeader>true</UseHostHeader>
+            <AddURLToLocalIntranetZone>true</AddURLToLocalIntranetZone>
+            <GrantCurrentUserFullControl>true</GrantCurrentUserFullControl>
+            <UseClaims>true</UseClaims>
+            <UseBasicAuthentication>false</UseBasicAuthentication>
+            <UseOnlineWebPartCatalog>false</UseOnlineWebPartCatalog>
+            <Database>
+                <Name>Verge</Name>
+                <DBAlias Create="false">
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+            <ManagedPaths/>
+            <SiteCollections>
+                <SiteCollection siteUrl="http://verge/">
+                    <Name>Verge</Name>
+                    <Description></Description>
+                    <HostNamedSiteCollection>false</HostNamedSiteCollection>
+                    <Owner></Owner>
+                    <CustomDatabase>contentVerge</CustomDatabase>
+                    <SearchUrl></SearchUrl>
+                    <Template>STS#1</Template>
+                    <LCID>1044</LCID>
+                    <Locale></Locale>
+                    <Time24>true</Time24>
+                </SiteCollection>
+            </SiteCollections>
+        </WebApplication>
+    </WebApplications>
+    <ServiceApps>
+        <ManagedMetadataServiceApp Provision="localhost">
+            <Name>Managed Metadata Service</Name>
+            <ProxyName>Managed Metadata Service</ProxyName>
+            <Database>
+                <Name>MetaData</Name>
+                <DBServer>SPSQL</DBServer>
+                <DBAlias Create="false">
+                    <DBInstance>VERGE-TEST-DB02</DBInstance>
+                    <DBPort>1433</DBPort>
+                </DBAlias>
+            </Database>
+        </ManagedMetadataServiceApp>
+        <UserProfileServiceApp Provision="false">
+            <Name>User Profile Service Application</Name>
+            <ProxyName>User Profile Service Application</ProxyName>
+            <MySiteHostLocation></MySiteHostLocation>
+            <MySiteManagedPath>personal</MySiteManagedPath>
+            <EnableNetBIOSDomainNames>false</EnableNetBIOSDomainNames>
+            <StartProfileSync>true</StartProfileSync>
+            <CreateDefaultSyncConnection>false</CreateDefaultSyncConnection>
+            <SyncConnectionAccount>VMSAK_QA\srv_qa_shp_Profile</SyncConnectionAccount>
+            <SyncConnectionAccountPassword>Jkme8NBI9H4V</SyncConnectionAccountPassword>
+            <Database>
+                <ProfileDB>Profile</ProfileDB>
+                <SyncDB>Sync</SyncDB>
+                <SocialDB>Social</SocialDB>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+        </UserProfileServiceApp>
+        <EnterpriseSearchService Provision="localhost">
+            <ContactEmail></ContactEmail>
+            <ConnectionTimeout>60</ConnectionTimeout>
+            <AcknowledgementTimeout>60</AcknowledgementTimeout>
+            <ProxyType>Default</ProxyType>
+            <IgnoreSSLWarnings>true</IgnoreSSLWarnings>
+            <InternetIdentity>Mozilla/4.0 (compatible; MSIE 8.0; Windows NT; MS Search 6.0 Robot)</InternetIdentity>
+            <CustomIndexLocation></CustomIndexLocation>
+            <PerformanceLevel>Reduced</PerformanceLevel>
+            <ShareName>SearchIndex</ShareName>
+            <EnterpriseSearchServiceApplications>
+                <EnterpriseSearchServiceApplication Name="Search Service Application">
+                    <FailoverDatabaseServer></FailoverDatabaseServer>
+                    <Partitioned>false</Partitioned>
+                    <Partitions>1</Partitions>
+                    <SearchServiceApplicationType>Regular</SearchServiceApplicationType>
+                    <ContentAccessAccount>VMSAK_QA\srv_qa_shp_Crawl</ContentAccessAccount>
+                    <ContentAccessAccountPassword>6o1GwgteckJs</ContentAccessAccountPassword>
+                    <Database>
+                        <Name>Search</Name>
+                        <DBServer>SPSQL</DBServer>
+                        <DBAlias Create="false">
+                            <DBInstance>VERGE-TEST-DB02</DBInstance>
+                            <DBPort>1433</DBPort>
+                        </DBAlias>
+                    </Database>
+                    <ApplicationPool Name="SharePoint Search Application Pool"/>
+                    <CrawlComponent Provision="localhost"/>
+                    <QueryComponent Provision="localhost"/>
+                    <SearchQueryAndSiteSettingsComponent Provision="localhost"/>
+                    <AdminComponent Provision="localhost">
+                        <ApplicationPool Name="SharePoint Search Application Pool"/>
+                    </AdminComponent>
+                    <IndexComponent Provision="localhost"/>
+                    <ContentProcessingComponent Provision="localhost"/>
+                    <AnalyticsProcessingComponent Provision="localhost"/>
+                    <Proxy Name="Search Service Application">
+                        <Partitioned>false</Partitioned>
+                        <ProxyGroup>Default</ProxyGroup>
+                    </Proxy>
+                    <SearchCenterUrl></SearchCenterUrl>
+                </EnterpriseSearchServiceApplication>
+            </EnterpriseSearchServiceApplications>
+        </EnterpriseSearchService>
+        <StateService Provision="localhost">
+            <Name>State Service</Name>
+            <ProxyName>State Service</ProxyName>
+            <Database>
+                <Name>StateService</Name>
+                <DBServer>SPSQL</DBServer>
+                <DBAlias Create="false">
+                    <DBInstance>VERGE-TEST-DB02</DBInstance>
+                    <DBPort>1433</DBPort>
+                </DBAlias>
+            </Database>
+        </StateService>
+        <WebAnalyticsService Provision="localhost">
+            <Name>Web Analytics Service Application</Name>
+            <Database>
+                <ReportingDB>WebAnalyticsReporting</ReportingDB>
+                <StagingDB>WebAnalyticsStaging</StagingDB>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+        </WebAnalyticsService>
+        <SPUsageService Provision="localhost">
+            <Name>Usage and Health Data Collection</Name>
+            <Database>
+                <Name>UsageAndHealth</Name>
+                <DBServer>SPSQL</DBServer>
+                <DBAlias Create="false">
+                    <DBInstance>VERGE-TEST-DB02</DBInstance>
+                    <DBPort>1433</DBPort>
+                </DBAlias>
+            </Database>
+        </SPUsageService>
+        <SecureStoreService Provision="localhost">
+            <Name>Secure Store Service</Name>
+            <ProxyName>Secure Store Service</ProxyName>
+            <Database>
+                <Name>SecureStore</Name>
+                <DBServer>SPSQL</DBServer>
+                <DBAlias Create="false">
+                    <DBInstance>VERGE-TEST-DB02</DBInstance>
+                    <DBPort>1433</DBPort>
+                </DBAlias>
+            </Database>
+        </SecureStoreService>
+        <BusinessDataConnectivity Provision="false">
+            <Name>Business Data Connectivity Service</Name>
+            <ProxyName>Business Data Connectivity Service</ProxyName>
+            <Database>
+                <Name>BusinessDataCatalog</Name>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+        </BusinessDataConnectivity>
+        <WordAutomationService Provision="false">
+            <Name>Word Automation Services</Name>
+            <ProxyName>Word Automation Services</ProxyName>
+            <Database>
+                <Name>WordAutomation</Name>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+        </WordAutomationService>
+        <AppManagementService Provision="false">
+            <Name>App Management Service</Name>
+            <ProxyName>App Management Service</ProxyName>
+            <AppDomain>app</AppDomain>
+            <Database>
+                <Name>AppService</Name>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+        </AppManagementService>
+        <SubscriptionSettingsService Provision="false">
+            <Name>Subscription Settings Service</Name>
+            <AppSiteSubscriptionName>app</AppSiteSubscriptionName>
+            <Database>
+                <Name>SubscriptionSettings</Name>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBInstance>VERGE-TEST-DB02</DBInstance>
+                    <DBPort>1433</DBPort>
+                </DBAlias>
+            </Database>
+        </SubscriptionSettingsService>
+        <WorkManagementService Provision="false">
+            <Name>Work Management Service Application</Name>
+            <ProxyName>Work Management Service Application</ProxyName>
+        </WorkManagementService>
+        <MachineTranslationService Provision="false">
+            <Name>Machine Translation Service</Name>
+            <ProxyName>Machine Translation Service</ProxyName>
+            <Database>
+                <Name>TranslationService</Name>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+        </MachineTranslationService>
+        <PowerPointConversionService Provision="false">
+            <Name>PowerPoint Conversion Service Application</Name>
+            <ProxyName>PowerPoint Conversion Service Application</ProxyName>
+        </PowerPointConversionService>
+    </ServiceApps>
+    <EnterpriseServiceApps>
+        <ExcelServices Provision="false">
+            <Name>Excel Services Application</Name>
+            <UnattendedIDUser>VMSAK_QA\srv_qa_shp_Excel</UnattendedIDUser>
+            <UnattendedIDPassword>frUGZvdjd7gk</UnattendedIDPassword>
+        </ExcelServices>
+        <VisioService Provision="false">
+            <Name>Visio Graphics Service</Name>
+            <ProxyName>Visio Graphics Service</ProxyName>
+            <UnattendedIDUser>VMSAK_QA\SP_VisioUser</UnattendedIDUser>
+            <UnattendedIDPassword></UnattendedIDPassword>
+        </VisioService>
+        <AccessService Provision="false">
+            <Name>Access 2010 Service</Name>
+            <ProxyName>Access 2010 Service</ProxyName>
+        </AccessService>
+        <AccessServices Provision="false">
+            <Name>Access Services</Name>
+            <ProxyName>Access Services</ProxyName>
+            <Database>
+                <Name>AccessServices</Name>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+        </AccessServices>
+        <PerformancePointService Provision="false">
+            <Name>PerformancePoint Service</Name>
+            <ProxyName>PerformancePoint Service</ProxyName>
+            <UnattendedIDUser>VMSAK_QA\SP_PerfPointUser</UnattendedIDUser>
+            <UnattendedIDPassword></UnattendedIDPassword>
+            <Database>
+                <Name>PerformancePoint</Name>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+        </PerformancePointService>
+    </EnterpriseServiceApps>
+    <OfficeWebApps Install="false">
+        <ConfigFile>config-OWA-2010.xml</ConfigFile>
+        <PIDKeyOWA></PIDKeyOWA>
+        <ExcelService Provision="false">
+            <Name>Excel Web App</Name>
+            <ProxyName>Excel Web App</ProxyName>
+            <UnattendedIDUser>CONTOSO\SP_ExcelUser</UnattendedIDUser>
+            <UnattendedIDPassword></UnattendedIDPassword>
+        </ExcelService>
+        <WordViewingService Provision="false">
+            <Name>Word Viewing Service</Name>
+            <ProxyName>Word Viewing Service</ProxyName>
+        </WordViewingService>
+        <PowerPointService Provision="false">
+            <Name>PowerPoint Service Application</Name>
+            <ProxyName>PowerPoint Service Application</ProxyName>
+        </PowerPointService>
+    </OfficeWebApps>
+    <ProjectServer Install="false">
+        <PIDKeyProjectServer></PIDKeyProjectServer>
+        <ServiceApp Provision="false">
+            <Name>Project Server Service Application</Name>
+            <ProxyName>Project Server Service Application</ProxyName>
+            <ManagedPath>PWA</ManagedPath>
+            <ServiceAccountPassword></ServiceAccountPassword>
+            <Database>
+                <Name>ProjectServer</Name>
+                <DBServer></DBServer>
+                <DBAlias Create="false">
+                    <DBPort></DBPort>
+                </DBAlias>
+            </Database>
+        </ServiceApp>
+    </ProjectServer>
+    <AdobePDF>
+        <iFilter Install="false"/>
+        <Icon Configure="true"/>
+        <MIMEType Configure="true"/>
+    </AdobePDF>
+    <ForeFront Install="false">
+        <ConfigFile>answerfile-ForeFront-2010.xml</ConfigFile>
+    </ForeFront>
+</Configuration>

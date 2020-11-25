@@ -9,6 +9,12 @@
       name: Administrator
       password: "{{ domain_admin_password }}"
 
+- name: "Add {{ ansible_user }} to local admins"
+  win_user:
+    name: "{{ ansible_user }}"
+    groups_action: add
+    groups: "Administrators"
+
 - name: Install Active Directory Feature
   win_feature:
     name: "{{ item }}"
