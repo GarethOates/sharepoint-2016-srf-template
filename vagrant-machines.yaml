@@ -23,7 +23,7 @@ Databases:
   box: garethoates/spfarm_base_windows2016
   hostname: VERGE-DDB01
   role: Database
-  memory: 4096
+  memory: 2048
   default: false
   ip_address: 10.10.1.17
   providers: virtualbox

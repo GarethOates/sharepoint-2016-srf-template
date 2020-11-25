@@ -8,8 +8,8 @@
     "tenant_id": "{{user `tenant_id`}}",
 
     "type": "azure-arm",
-    "managed_image_resource_group_name": "sp2016-vera",
-    "managed_image_name": "spfarm2016",
+    "managed_image_resource_group_name": "windows-images",
+    "managed_image_name": "WindowsServer2016Base",
 
     "os_type": "Windows",
     "image_publisher": "MicrosoftWindowsServer",

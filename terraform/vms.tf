@@ -1,6 +1,6 @@
 data "azurerm_image" "sp2016farmImage" {
-    name                = "spfarm2016"
-    resource_group_name = "sp2016-vera"
+    name                = "WindowsServer2016Base"
+    resource_group_name = "windows-images"
 }
 
 locals {

@@ -1,21 +1,21 @@
 DomainControllers:
-   hosts:
-     DomainController1:
-       ansible_ssh_host: 10.10.1.18
-       ansible_user: vagrant
-       ansible_password: vagrant
-       hostname: VERGE-DAD01
+    hosts:
+        DomainController1:
+            ansible_ssh_host: 10.10.1.18
+            ansible_user: vagrant
+            ansible_password: vagrant
+            hostname: VERGE-DAD01
 Webservers:
-   hosts:
-     SharePoint1:
-       ansible_ssh_host: 10.10.1.19
-       ansible_user: vagrant
-       ansible_password: vagrant
-       hostname: VERGE-DWEB01
+    hosts:
+        SharePoint1:
+            ansible_ssh_host: 10.10.1.19
+            ansible_user: vagrant
+            ansible_password: vagrant
+            hostname: VERGE-DWEB01
 Databases:
-   hosts:
-     Database1:
-       ansible_ssh_host: 10.10.1.17
-       ansible_user: vagrant
-       ansible_password: vagrant
-       hostname: VERGE-DDB01
+    hosts:
+        Database1:
+            ansible_ssh_host: 10.10.1.17
+            ansible_user: vagrant
+            ansible_password: vagrant
+            hostname: VERGE-DDB01
