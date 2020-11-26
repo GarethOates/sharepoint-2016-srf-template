@@ -2,6 +2,8 @@
   win_service:
     name: ADWS
     state: started
+  tags:
+    - all-environments
 
 - name: "Add vagrant to Domain Admins"
   win_domain_user:
@@ -9,14 +11,14 @@
     firstname: Vagrant
     surname: Account
     upn: "{{ domain_vagrant_user }}"
-    domain_username: "{{ domain_admin_user }}"
-    domain_password: "{{ domain_admin_password }}"
+    domain_username: "{{ domain_vagrant_user }}"
+    domain_password: "{{ domain_vagrant_password }}"
     state: present
     groups_action: add
     groups:
       - Domain Admins
   tags:
-    - local-only
+    - all-environments
 
 - name: Create SharePoint Service Accounts
   win_domain_user:
@@ -41,3 +43,32 @@
     - SP_SearchService
     - SP_Services
     - SP_VisioUser
+  tags:
+    - local-only
+
+# Azure doesn't allow use of Administrator account. Must use vagrant.
+- name: Create SharePoint Service Accounts
+  win_domain_user:
+    name: "{{ item }}"
+    password: "{{ services_password }}"
+    state: present
+    upn: "{{ item }}@{{ domain }}"
+    domain_username: "{{ domain_vagrant_user }}"
+    domain_password: "{{ domain_vagrant_password }}"
+  with_items:
+    - SP_Admin
+    - SP_CacheSuperReader
+    - SP_CacheSuperUser
+    - SP_Crawl
+    - SP_ExcelUser
+    - SP_Farm
+    - SP_MySite
+    - SP_PerfPointUser
+    - SP_PortalAppPool
+    - SP_ProfilesAppPool
+    - SP_SearchContent
+    - SP_SearchService
+    - SP_Services
+    - SP_VisioUser
+  tags:
+    - azure-only

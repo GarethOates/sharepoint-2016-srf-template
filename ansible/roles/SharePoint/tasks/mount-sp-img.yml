@@ -20,6 +20,10 @@
       state: present
   register: disk_image_out
 
+- name: Debug image out 
+  debug:
+    var: disk_image_out
+
 - name: Create c:\SP directory
   win_file:
     path: C:\SP
@@ -38,7 +42,7 @@
 
 - name: Copy SP Bits to SPAutoInstaller folder structure
   win_copy:
-    src: "{{ disk_image_out.mount_path}}"
+    src: "{{ disk_image_out.mount_paths[0] }}"
     dest: C:\SP\2016\SharePoint\
     force: yes
     remote_src: yes

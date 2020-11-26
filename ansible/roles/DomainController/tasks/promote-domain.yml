@@ -3,11 +3,15 @@
     section: System Access
     key: PasswordComplexity
     value: "0"
+  tags:
+    - all-environments
 
 - name: Set Administrator Password
   win_user:
       name: Administrator
       password: "{{ domain_admin_password }}"
+  tags:
+    - all-environments
 
 - name: Install Active Directory Feature
   win_feature:
@@ -16,11 +20,15 @@
   with_items:
     - AD-domain-services
     - DNS
+  tags:
+    - all-environments    
 
 - name: Ensure C:\Windows\NTDS Exists
   win_file:
     name: C:\Windows\NTDS
     state: directory
+  tags:
+    - all-environments    
 
 - name: Create new Windows domain in a new forest
   win_domain:
@@ -35,8 +43,12 @@
     log_path: C:\Windows\NTDS
     sysvol_path: C:\Windows\SYSVOL
   register: dc_promotion
+  tags:
+    - all-environments  
 
 - name: Reboot for AD changes to take effect
   win_reboot:
     post_reboot_delay: 720
   when: dc_promotion.reboot_required
+  tags:
+    - all-environments
