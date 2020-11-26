@@ -1,7 +1,7 @@
 ---
 domain: "vmsak-dev.no"
 netbios: "VMSAK-DEV"
-dns_server: "192.168.2.18"
+dns_server: "10.10.1.18"
 
 domain_vagrant_user: "{{ ansible_user }}@{{ domain }}"
 domain_vagrant_password: Pass@word1!

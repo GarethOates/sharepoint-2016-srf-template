@@ -36,21 +36,6 @@
     sysvol_path: C:\Windows\SYSVOL
   register: dc_promotion
 
-- name: "Add vagrant to Domain Admins"
-  win_domain_user:
-    name: vagrant
-    firstname: Vagrant
-    surname: Account
-    upn: "{{ domain_vagrant_user }}"
-    domain_username: "{{ domain_admin_user }}"
-    domain_password: "{{ domain_admin_password }}"
-    state: present
-    groups_action: add
-    groups:
-      - Domain Admins
-  tags:
-    - local-only
-
 - name: Reboot for AD changes to take effect
   win_reboot:
     post_reboot_delay: 720

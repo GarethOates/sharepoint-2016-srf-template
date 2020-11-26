@@ -46,7 +46,7 @@
 
 - name: Copy SQL Server ConfigurationFile to C:\
   win_template:
-    src: ../roles/internal/Database/templates/ConfigurationFile.ini.j2
+    src: ../roles/Database/templates/ConfigurationFile.ini.j2
     dest: c:\ConfigurationFile.ini
   tags:
   - local-only
