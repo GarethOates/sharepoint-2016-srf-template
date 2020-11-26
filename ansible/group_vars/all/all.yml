@@ -6,11 +6,10 @@ dns_server: "192.168.2.18"
 domain_vagrant_user: "{{ ansible_user }}@{{ domain }}"
 domain_vagrant_password: Pass@word1!
 
-domain_admin_user: "vagrant@{{ domain }}"
+domain_admin_user: "Administrator@{{ domain }}"
 domain_admin_password: Pass@word1!
 
 sys_admin_account: "{{ netbios }}\\{{ ansible_user }}"
-
 
 farm_password: "Pass@word1!"
 services_password: "Pass@word1!"

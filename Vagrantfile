@@ -6,7 +6,6 @@ require 'json'
 error = Vagrant::Errors::VagrantError
 
 machines = YAML.load_file 'vagrant-machines.yaml'
-ANSIBLE_RAW_SSH_ARGS = []
 
 File.exists? "ansible/hosts_dev_env.yaml"
 
@@ -36,12 +35,12 @@ Vagrant.configure(2) do |config|
     default = machine[1]['default'] || false
     ip_address = machine[1]['ip_address']
 
-    ANSIBLE_RAW_SSH_ARGS << "-o IdentityFile=~/.vagrant.d/insecure_private_key"
-
     fail error.new, 'machines must contain a name' if name.nil?
+    faile error.new, 'box must be defined' if box.nil?
 
     config.vm.define name, primary: default, autostart: default do |cfg|
       cfg.vm.hostname = hostname
+      cfg.vm.box = box
 
       # credentials
       cfg.winrm.username = "vagrant"
@@ -54,17 +53,6 @@ Vagrant.configure(2) do |config|
       cfg.vm.network "private_network", ip: ip_address
       cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
       cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
-
-      if box
-        cfg.vm.box = box
-
-      elsif box_url && box_name
-        cfg.vm.box = box_name
-        cfg.vm.box_url = box_url
-
-      else
-        fail error.new, 'machines must contain box or box_name and box_url'
-      end
 
       if providers == 'virtualbox'
         cfg.vm.provider :virtualbox do |v|
@@ -84,7 +72,6 @@ Vagrant.configure(2) do |config|
               ansible.limit = "DomainControllers"
               ansible.playbook = "ansible/plays/domaincontroller.yml"
               ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-              ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
               ansible.extra_vars = {
                 "cloud_host" => "#{machine[1]['hostname']}"
               }
@@ -95,7 +82,6 @@ Vagrant.configure(2) do |config|
             ansible.limit = "Webservers"
             ansible.playbook = "ansible/plays/sharepoint.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-            ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
             ansible.extra_vars = {
               "cloud_host" => "#{machine[1]['hostname']}"
             }
@@ -106,7 +92,6 @@ Vagrant.configure(2) do |config|
             ansible.limit = "Databases"
             ansible.playbook = "ansible/plays/databaseservers.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
-            ansible.raw_ssh_args = ANSIBLE_RAW_SSH_ARGS
             ansible.extra_vars = {
               "cloud_host" => "#{machine[1]['hostname']}"
             }

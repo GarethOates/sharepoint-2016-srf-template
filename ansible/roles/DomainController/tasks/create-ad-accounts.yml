@@ -1,3 +1,8 @@
+- name: Ensure ADWS Services Running
+  win_service:
+    name: ADWS
+    state: started
+
 - name: Create SharePoint Service Accounts
   win_domain_user:
     name: "{{ item }}"
@@ -21,19 +26,3 @@
     - SP_SearchService
     - SP_Services
     - SP_VisioUser
-
-- name: Add Vagrant Account to Domain Admins
-  win_domain_user:
-    name: vagrant
-    firstname: Vagrant
-    surname: Account
-    upn: "{{ domain_vagrant_user }}"
-    password: "{{ domain_vagrant_password }}"
-    password_never_expires: yes
-    account_locked: no
-    domain_username: "{{ domain_admin_user }}"
-    domain_password: "{{ domain_admin_password }}"
-    state: present
-    groups_action: add
-    groups:
-      - Domain Admins

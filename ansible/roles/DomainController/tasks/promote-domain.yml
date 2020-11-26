@@ -9,12 +9,6 @@
       name: Administrator
       password: "{{ domain_admin_password }}"
 
-- name: "Add {{ ansible_user }} to local admins"
-  win_user:
-    name: "{{ ansible_user }}"
-    groups_action: add
-    groups: "Administrators"
-
 - name: Install Active Directory Feature
   win_feature:
     name: "{{ item }}"
@@ -41,6 +35,21 @@
     log_path: C:\Windows\NTDS
     sysvol_path: C:\Windows\SYSVOL
   register: dc_promotion
+
+- name: "Add vagrant to Domain Admins"
+  win_domain_user:
+    name: vagrant
+    firstname: Vagrant
+    surname: Account
+    upn: "{{ domain_vagrant_user }}"
+    domain_username: "{{ domain_admin_user }}"
+    domain_password: "{{ domain_admin_password }}"
+    state: present
+    groups_action: add
+    groups:
+      - Domain Admins
+  tags:
+    - local-only
 
 - name: Reboot for AD changes to take effect
   win_reboot:
