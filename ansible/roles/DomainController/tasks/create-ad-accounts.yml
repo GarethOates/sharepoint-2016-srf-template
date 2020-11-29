@@ -5,21 +5,6 @@
   tags:
     - all-environments
 
-- name: "Add vagrant to Domain Admins"
-  win_domain_user:
-    name: vagrant
-    firstname: Vagrant
-    surname: Account
-    upn: "{{ domain_vagrant_user }}"
-    domain_username: "{{ domain_vagrant_user }}"
-    domain_password: "{{ domain_vagrant_password }}"
-    state: present
-    groups_action: add
-    groups:
-      - Domain Admins
-  tags:
-    - all-environments
-
 - name: Create SharePoint Service Accounts
   win_domain_user:
     name: "{{ item }}"

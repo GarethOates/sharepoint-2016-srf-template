@@ -105,7 +105,7 @@
 - name: Find AutoSPInstall Log File
   win_find:
     paths:
-      - "C:\\Users\\{{ ansible_user }}.{{ netbios }}\\Desktop"
+      - "C:\\Users\\{{ ansible_user }}\\Desktop"
     patterns: ['*.log', '*.txt']
     get_checksum: no
   register: logs

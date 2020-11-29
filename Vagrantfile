@@ -72,6 +72,7 @@ Vagrant.configure(2) do |config|
               ansible.limit = "DomainControllers"
               ansible.playbook = "ansible/plays/domaincontroller.yml"
               ansible.inventory_path = "ansible/hosts_dev_env.yaml"
+              ansible.tags = "all-environments,local-only"
               ansible.extra_vars = {
                 "cloud_host" => "#{machine[1]['hostname']}"
               }
