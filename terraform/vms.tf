@@ -21,10 +21,7 @@ resource "azurerm_virtual_machine" "spfarm_db1" {
     depends_on = [azurerm_virtual_machine.spfarm_ad1]
 
     storage_image_reference {
-        publisher = "MicrosoftSQLServer"
-        offer     = "SQL2014SP2-WS2012R2"
-        sku       = "Enterprise"
-        version   = "latest"
+        id = data.azurerm_image.sp2016farmImage.id
     }
 
     storage_os_disk {
