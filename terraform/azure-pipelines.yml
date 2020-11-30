@@ -22,9 +22,9 @@ stages:
 
       steps:
       - task: TerraformInstaller@0
-        displayName: Use Terraform 0.13.4
+        displayName: Use Terraform 0.13.5
         inputs:
-          terraformVersion: '0.13.4'
+          terraformVersion: '0.13.5'
 
       - task: TerraformCLI@0
         displayName: Initialize Terraform
@@ -79,9 +79,9 @@ stages:
           deploy:
             steps:
               - task: TerraformInstaller@0
-                displayName: Use Terraform 0.13.4
+                displayName: Use Terraform 0.13.5
                 inputs:
-                  terraformVersion: '0.13.4'
+                  terraformVersion: '0.13.5'
 
               - task: TerraformCLI@0
                 displayName: Initialize Terraform
