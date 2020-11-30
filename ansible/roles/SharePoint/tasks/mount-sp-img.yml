@@ -88,7 +88,7 @@
 - name: Reboot after Installing Prerequisites
   win_reboot:
 
-- name: Trigger AutoSPInstaller (computer will restart and continue install)
+- name: Trigger AutoSPInstaller
   win_psexec:
     command: C:\SP\AutoSPInstaller\AutoSPInstallerLaunch.bat
     priority: high
@@ -105,12 +105,13 @@
 - name: Find AutoSPInstall Log File
   win_find:
     paths:
-      - "C:\\Users\\{{ ansible_user }}\\Desktop"
-    patterns: ['*.log', '*.txt']
+      - "{{ ansible_user_dir }}\\Desktop"
+      - "{{ ansible_user_dir }}.{{ netbios }}\\Desktop"
+    patterns: ['*.log']
     get_checksum: no
   register: logs
 
-- name: Found files
+- name: Log File Path
   debug:
     var: logs.files[0].path
 
@@ -120,6 +121,7 @@
     regex: Press any key
     state: present
     timeout: 2400
+  failed_when: logs.matched == 0
 
 - name: Reboot server
   win_reboot:
