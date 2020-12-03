@@ -1,0 +1,6 @@
+---
+- name: sharepointweb.yml | All roles
+  hosts: WebServers
+
+  roles:
+    - { role: "SharePointWeb" }

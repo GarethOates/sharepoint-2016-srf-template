@@ -1,3 +1,6 @@
+- name: Disable User Access Control UAC
+  script: ../../common/files/disable-uac.bat
+
 - name: Setup DNS Server to point to DC
   win_dns_client:
     adapter_names: "Ethernet 2"

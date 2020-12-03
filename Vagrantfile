@@ -42,6 +42,8 @@ Vagrant.configure(2) do |config|
       cfg.vm.hostname = hostname
       cfg.vm.box = box
 
+      cfg.vm.synced_folder '.', '/vagrant', disabled: true
+
       # credentials
       cfg.winrm.username = "vagrant"
       cfg.winrm.password = "vagrant"
@@ -78,10 +80,20 @@ Vagrant.configure(2) do |config|
               }
             end
 
-        elsif ARGV[1].start_with?('SharePoint')
+        elsif ARGV[1].start_with?('SharePointWeb')
           cfg.vm.provision :ansible do |ansible|
             ansible.limit = "Webservers"
-            ansible.playbook = "ansible/plays/sharepoint.yml"
+            ansible.playbook = "ansible/plays/sharepointweb.yml"
+            ansible.inventory_path = "ansible/hosts_dev_env.yaml"
+            ansible.extra_vars = {
+              "cloud_host" => "#{machine[1]['hostname']}"
+            }
+          end
+
+        elsif ARGV[1].start_with?('SharePointApp')
+          cfg.vm.provision :ansible do |ansible|
+            ansible.limit = "AppServers"
+            ansible.playbook = "ansible/plays/sharepointapp.yml"
             ansible.inventory_path = "ansible/hosts_dev_env.yaml"
             ansible.extra_vars = {
               "cloud_host" => "#{machine[1]['hostname']}"

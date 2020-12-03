@@ -1,0 +1,9 @@
+- name: Join Server to existing SharePoint 2016 Farm
+  win_psexec:
+    command: "powershell.exe Start-Process $PSHOME\\powershell.exe -ArgumentList '-NoExit -ExecutionPolicy Bypass  C:\\SP\\addServerToFarm.ps1 -DBServer SPSQL -DBName SP2016_Config -PassPhrase {{ domain_vagrant_password }} -SP2016 -ServerRole Custom'"
+    priority: high
+    elevated: yes
+    interactive: yes
+    username: "{{ domain_vagrant_user }}"
+    password: "{{ domain_vagrant_password }}"
+    wait: no

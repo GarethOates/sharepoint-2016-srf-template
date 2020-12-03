@@ -14,20 +14,15 @@
     domain_username: "{{ domain_admin_user }}"
     domain_password: "{{ domain_admin_password }}"
   with_items:
+    - SP_Services
+    - SP_PortalAppPool
+    - SP_SearchService
     - SP_Admin
     - SP_CacheSuperReader
     - SP_CacheSuperUser
     - SP_Crawl
-    - SP_ExcelUser
     - SP_Farm
-    - SP_MySite
-    - SP_PerfPointUser
-    - SP_PortalAppPool
-    - SP_ProfilesAppPool
-    - SP_SearchContent
-    - SP_SearchService
-    - SP_Services
-    - SP_VisioUser
+    - SP_Vera
   tags:
     - local-only
 
@@ -41,19 +36,15 @@
     domain_username: "{{ domain_vagrant_user }}"
     domain_password: "{{ domain_vagrant_password }}"
   with_items:
+    - SP_Services
+    - SP_PortalAppPool
+    - SP_SearchService
     - SP_Admin
     - SP_CacheSuperReader
     - SP_CacheSuperUser
     - SP_Crawl
-    - SP_ExcelUser
     - SP_Farm
-    - SP_MySite
-    - SP_PerfPointUser
-    - SP_PortalAppPool
-    - SP_ProfilesAppPool
-    - SP_SearchContent
-    - SP_SearchService
-    - SP_Services
-    - SP_VisioUser
+    - SP_Vera
+
   tags:
     - azure-only

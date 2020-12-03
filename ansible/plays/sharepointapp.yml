@@ -1,0 +1,6 @@
+---
+- name: sharepointapp.yml | All roles
+  hosts: AppServers
+
+  roles:
+    - { role: "SharePointApp" }

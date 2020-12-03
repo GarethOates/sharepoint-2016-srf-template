@@ -1,15 +1,11 @@
 - name: Disable User Access Control UAC
-  script: disable-uac.bat
+  script: ../../common/files/disable-uac.bat
 
-- name: Install .NET Framework 3.5 (its required for database install)
-  win_feature:
-    name: Net-Framework-Features
+- name: Install DotNet Framework 4.6.1 
+  win_chocolatey:
+    name: dotnet4.6.1
     state: present
-    restart: yes
-    include_sub_features: yes
-    include_management_tools: yes
 
-# open up firewall port 1433 for SQL to accept incoming connections.
 - name: Open port 1433 for remote connections to SQL Server
   win_firewall_rule:
       name: SQL Server Remote Connections
@@ -34,20 +30,20 @@
   win_reboot:
   when: domainusers.changed
 
-- name: Download SQL Server ISO to root C:\
+- name: Download SQL Server ISO to C Drive
   win_get_url:
-    url: http://download.microsoft.com/download/6/D/9/6D90C751-6FA3-4A78-A78E-D11E1C254700/SQLServer2014SP2-FullSlipstream-x64-ENU.iso
-    dest: c:\SQLServer2014-x64-ENU.iso
+    url: http://www.techoverflow.com/SQLServer2016-x64-ENU.iso
+    dest: c:\SQLServer2016-x64-ENU.iso
     force: no
 
-- name: Copy SQL Server ConfigurationFile to C:\
+- name: Copy SQL Server ConfigurationFile
   win_template:
     src: ../roles/Database/templates/ConfigurationFile.ini.j2
     dest: c:\ConfigurationFile.ini
 
 - name: Mount SQL Server ISO Image
   win_disk_image:
-    image_path: C:\SQLServer2014-x64-ENU.iso
+    image_path: C:\SQLServer2016-x64-ENU.iso
     state: present
   register: disk_image_out
 

@@ -1,6 +1,0 @@
----
-- name: webservers.yml | All roles
-  hosts: Webservers
-
-  roles:
-    - { role: "SharePoint" }

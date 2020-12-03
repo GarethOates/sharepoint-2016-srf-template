@@ -8,14 +8,24 @@ DomainControllers:
   ip_address: 10.10.1.18
   providers: virtualbox
 
-Webservers:
-  name: SharePoint1
+WebServers:
+  name: SharePointWeb1
   box: garethoates/spfarm_base_windows2016
   hostname: VERGE-DWEB01
   role: Front-End
   memory: 2048
   default: false
   ip_address: 10.10.1.19
+  providers: virtualbox
+
+AppServers:
+  name: SharePointApp1
+  box: garethoates/spfarm_base_windows2016
+  hostname: VERGE-DAPP01
+  role: Application
+  memory: 2048
+  default: false
+  ip_address: 10.10.1.20
   providers: virtualbox
 
 Databases:

@@ -1,17 +1,17 @@
-<Configuration Environment="Test" Version="3.99.60">
+﻿<Configuration Environment="Test" Version="3.99.70">
     <Install SPVersion="2016">
         <ConfigFile>config-AutoSPInstaller.xml</ConfigFile>
         <InstallDir></InstallDir>
         <DataDir></DataDir>
-        <PIDKey>NWFM7-QVBRH-C4DR7-844BB-JK82F</PIDKey>
-        <SKU>Standard</SKU>
+        <PIDKey>NQGJR-63HC8-XCRQH-MYVCH-3J3QR</PIDKey>
+        <SKU>Enterprise</SKU>
         <OfflineInstall>false</OfflineInstall>
-        <PauseAfterInstall>true</PauseAfterInstall>
+        <PauseAfterInstall>false</PauseAfterInstall>
         <RemoteInstall Enable="false">
             <ParallelInstall>false</ParallelInstall>
         </RemoteInstall>
         <AutoAdminLogon Enable="true">
-            <Password>V3rgeSP!nstall</Password>
+            <Password>{{ domain_admin_password }}</Password>
         </AutoAdminLogon>
         <Disable>
             <LoopbackCheck>true</LoopbackCheck>
@@ -21,29 +21,33 @@
         </Disable>
     </Install>
     <Farm>
-        <Passphrase>iwhgweiongJNHDGJO478539485</Passphrase>
+        <Passphrase>{{ farm_password }}</Passphrase>
         <Account>
             <AddToLocalAdminsDuringSetup>true</AddToLocalAdminsDuringSetup>
             <LeaveInLocalAdmins>true</LeaveInLocalAdmins>
-            <Username>VMSAK_QA\srv_qa_shp_farm</Username>
-            <Password>V3rgeSP!nstall</Password>
+            <Username>{{ netbios }}\SP_Farm</Username>
+            <Password>{{ farm_password }}</Password>
         </Account>
-        <CentralAdmin Provision="localhost">
+        <CentralAdmin Provision="VERGE-DAPP01">
             <Database>Content_CentralAdmin</Database>
-            <Port>2013</Port>
+            <Port>2016</Port>
             <UseSSL>false</UseSSL>
         </CentralAdmin>
         <Database>
             <DBServer>SPSQL</DBServer>
+            <SQLAuthentication Enable="false">
+                <SQLUserName></SQLUserName>
+                <SQLPassword></SQLPassword>
+            </SQLAuthentication>
             <DBAlias Create="true">
-                <DBInstance>VERGE-TDB02</DBInstance>
+                <DBInstance>VERGE-DDB01</DBInstance>
                 <DBPort>1433</DBPort>
             </DBAlias>
             <DBPrefix>SP2016</DBPrefix>
             <ConfigDB>Config</ConfigDB>
         </Database>
         <Services>
-            <SandboxedCodeService Start="false"/>
+            <SandboxedCodeService Start="localhost"/>
             <ClaimsToWindowsTokenService Start="localhost" UpdateAccount="true"/>
             <SMTP Install="false"/>
             <OutgoingEmail Configure="false">
@@ -52,12 +56,12 @@
                 <ReplyToEmail></ReplyToEmail>
             </OutgoingEmail>
             <IncomingEmail Start="localhost"/>
-            <DistributedCache Start="localhost"/>
+            <DistributedCache Start="VERGE-DWEB01"/>
             <WorkflowTimer Start="localhost"/>
             <FoundationWebApplication Start="localhost"/>
         </Services>
         <ServerRoles>
-            <Custom Provision="false"/>
+            <Custom Provision="localhost"/>
             <WebFrontEnd Provision="false"/>
             <WebFrontEndWithDistributedCache Provision="false"/>
             <SingleServerFarm Provision="localhost"/>
@@ -68,21 +72,21 @@
         </ServerRoles>
         <ManagedAccounts>
             <ManagedAccount CommonName="spservice">
-                <Username>VMSAK_QA\srv_qa_shp_Service</Username>
-                <Password>LJfvH3Jcu13t</Password>
+                <Username>{{ netbios }}\SP_Services</Username>
+                <Password>{{ services_password }}</Password>
             </ManagedAccount>
             <ManagedAccount CommonName="Portal">
-                <Username>VMSAK_QA\srv_qa_shp_App01</Username>
-                <Password>oU8tqUQD6bZ6</Password>
+                <Username>{{ netbios }}\SP_PortalAppPool</Username>
+                <Password>{{ portalapppool_password }}</Password>
             </ManagedAccount>
             <ManagedAccount CommonName="SearchService">
-                <Username>VMSAK_QA\srv_qa_shp_Search</Username>
-                <Password>rbngIY502Lbd</Password>
+                <Username>{{ netbios }}\SP_SearchService</Username>
+                <Password>{{ search_service_password }}</Password>
             </ManagedAccount>
         </ManagedAccounts>
         <ObjectCacheAccounts>
-            <SuperUser>VMSAK_QA\srv_qa_shp_SuperU</SuperUser>
-            <SuperReader>VMSAK_QA\srv_qa_shp_SuperR</SuperReader>
+            <SuperUser>{{ netbios }}\SP_CacheSuperUser</SuperUser>
+            <SuperReader>{{ netbios }}\SP_CacheSuperReader</SuperReader>
         </ObjectCacheAccounts>
         <Logging>
             <IISLogs Compress="true">
@@ -90,8 +94,8 @@
             </IISLogs>
             <ULSLogs Compress="true">
                 <LogLocation></LogLocation>
-                <LogDiskSpaceUsageGB>20</LogDiskSpaceUsageGB>
-                <DaysToKeepLogs>7</DaysToKeepLogs>
+                <LogDiskSpaceUsageGB></LogDiskSpaceUsageGB>
+                <DaysToKeepLogs></DaysToKeepLogs>
                 <LogCutInterval></LogCutInterval>
             </ULSLogs>
             <UsageLogs Compress="true">
@@ -102,10 +106,10 @@
         </Logging>
     </Farm>
     <WebApplications AddURLsToHOSTS="true">
-        <WebApplication Name="Verge">
+        <WebApplication Name="Vera">
             <Type>Portal</Type>
-            <ApplicationPool>Sharepoint</ApplicationPool>
-            <Url>http://verge</Url>
+            <ApplicationPool>Vera</ApplicationPool>
+            <Url>http://index.vmsak-dev.no</Url>
             <Port>80</Port>
             <UseHostHeader>true</UseHostHeader>
             <AddURLToLocalIntranetZone>true</AddURLToLocalIntranetZone>
@@ -114,7 +118,12 @@
             <UseBasicAuthentication>false</UseBasicAuthentication>
             <UseOnlineWebPartCatalog>false</UseOnlineWebPartCatalog>
             <Database>
-                <Name>Verge</Name>
+                <Name>Vera</Name>
+                <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -122,31 +131,34 @@
             </Database>
             <ManagedPaths/>
             <SiteCollections>
-                <SiteCollection siteUrl="http://verge/">
-                    <Name>Verge</Name>
+                <SiteCollection siteUrl="http://index.vmsak-dev.no">
+                    <Name>Vera</Name>
                     <Description></Description>
                     <HostNamedSiteCollection>false</HostNamedSiteCollection>
-                    <Owner></Owner>
-                    <CustomDatabase>contentVerge</CustomDatabase>
+                    <CustomDatabase>contentVera</CustomDatabase>
                     <SearchUrl></SearchUrl>
                     <Template>STS#1</Template>
                     <LCID>1044</LCID>
-                    <Locale></Locale>
+                    <Locale>nb-no</Locale>
                     <Time24>true</Time24>
                 </SiteCollection>
             </SiteCollections>
         </WebApplication>
     </WebApplications>
     <ServiceApps>
-        <ManagedMetadataServiceApp Provision="localhost">
+        <ManagedMetadataServiceApp Provision="VERGE-DAPP01">
             <Name>Managed Metadata Service</Name>
             <ProxyName>Managed Metadata Service</ProxyName>
             <Database>
                 <Name>MetaData</Name>
-                <DBServer>SPSQL</DBServer>
+                <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
-                    <DBInstance>VERGE-TEST-DB02</DBInstance>
-                    <DBPort>1433</DBPort>
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
                 </DBAlias>
             </Database>
         </ManagedMetadataServiceApp>
@@ -155,29 +167,34 @@
             <ProxyName>User Profile Service Application</ProxyName>
             <MySiteHostLocation></MySiteHostLocation>
             <MySiteManagedPath>personal</MySiteManagedPath>
-            <EnableNetBIOSDomainNames>false</EnableNetBIOSDomainNames>
+            <EnableNetBIOSDomainNames>true</EnableNetBIOSDomainNames>
             <StartProfileSync>true</StartProfileSync>
             <CreateDefaultSyncConnection>false</CreateDefaultSyncConnection>
-            <SyncConnectionAccount>VMSAK_QA\srv_qa_shp_Profile</SyncConnectionAccount>
-            <SyncConnectionAccountPassword>Jkme8NBI9H4V</SyncConnectionAccountPassword>
+            <SyncConnectionAccount>{{ netbios }}\SP_ProfileSync</SyncConnectionAccount>
+            <SyncConnectionAccountPassword></SyncConnectionAccountPassword>
             <Database>
                 <ProfileDB>Profile</ProfileDB>
                 <SyncDB>Sync</SyncDB>
                 <SocialDB>Social</SocialDB>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
+                    <DBInstance></DBInstance>
                     <DBPort></DBPort>
                 </DBAlias>
             </Database>
         </UserProfileServiceApp>
-        <EnterpriseSearchService Provision="localhost">
+        <EnterpriseSearchService Provision="VERGE-DAPP01">
             <ContactEmail></ContactEmail>
-            <ConnectionTimeout>60</ConnectionTimeout>
-            <AcknowledgementTimeout>60</AcknowledgementTimeout>
+            <ConnectionTimeout>120</ConnectionTimeout>
+            <AcknowledgementTimeout>120</AcknowledgementTimeout>
             <ProxyType>Default</ProxyType>
             <IgnoreSSLWarnings>true</IgnoreSSLWarnings>
             <InternetIdentity>Mozilla/4.0 (compatible; MSIE 8.0; Windows NT; MS Search 6.0 Robot)</InternetIdentity>
-            <CustomIndexLocation></CustomIndexLocation>
+            <CustomIndexLocation>C:\SPIndex</CustomIndexLocation>
             <PerformanceLevel>Reduced</PerformanceLevel>
             <ShareName>SearchIndex</ShareName>
             <EnterpriseSearchServiceApplications>
@@ -186,26 +203,30 @@
                     <Partitioned>false</Partitioned>
                     <Partitions>1</Partitions>
                     <SearchServiceApplicationType>Regular</SearchServiceApplicationType>
-                    <ContentAccessAccount>VMSAK_QA\srv_qa_shp_Crawl</ContentAccessAccount>
-                    <ContentAccessAccountPassword>6o1GwgteckJs</ContentAccessAccountPassword>
+                    <ContentAccessAccount>{{ netbios }}\SP_Crawl</ContentAccessAccount>
+                    <ContentAccessAccountPassword>{{ crawl_password }}</ContentAccessAccountPassword>
                     <Database>
                         <Name>Search</Name>
-                        <DBServer>SPSQL</DBServer>
+                        <DBServer></DBServer>
+                        <SQLAuthentication UseFarmSetting="true">
+                            <SQLUserName></SQLUserName>
+                            <SQLPassword></SQLPassword>
+                        </SQLAuthentication>
                         <DBAlias Create="false">
-                            <DBInstance>VERGE-TEST-DB02</DBInstance>
-                            <DBPort>1433</DBPort>
+                            <DBInstance></DBInstance>
+                            <DBPort></DBPort>
                         </DBAlias>
                     </Database>
                     <ApplicationPool Name="SharePoint Search Application Pool"/>
-                    <CrawlComponent Provision="localhost"/>
-                    <QueryComponent Provision="localhost"/>
-                    <SearchQueryAndSiteSettingsComponent Provision="localhost"/>
-                    <AdminComponent Provision="localhost">
+                    <CrawlComponent Provision="VERGE-DAPP01"/>
+                    <QueryComponent Provision="VERGE-DWEB01"/>
+                    <SearchQueryAndSiteSettingsComponent Provision="VERGE-DAPP01"/>
+                    <AdminComponent Provision="VERGE-DAPP01">
                         <ApplicationPool Name="SharePoint Search Application Pool"/>
                     </AdminComponent>
-                    <IndexComponent Provision="localhost"/>
-                    <ContentProcessingComponent Provision="localhost"/>
-                    <AnalyticsProcessingComponent Provision="localhost"/>
+                    <IndexComponent Provision="VERGE-DAPP01"/>
+                    <ContentProcessingComponent Provision="VERGE-DAPP01"/>
+                    <AnalyticsProcessingComponent Provision="VERGE-DAPP01"/>
                     <Proxy Name="Search Service Application">
                         <Partitioned>false</Partitioned>
                         <ProxyGroup>Default</ProxyGroup>
@@ -214,15 +235,19 @@
                 </EnterpriseSearchServiceApplication>
             </EnterpriseSearchServiceApplications>
         </EnterpriseSearchService>
-        <StateService Provision="localhost">
+        <StateService Provision="VERGE-DAPP01">
             <Name>State Service</Name>
             <ProxyName>State Service</ProxyName>
             <Database>
                 <Name>StateService</Name>
-                <DBServer>SPSQL</DBServer>
+                <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
-                    <DBInstance>VERGE-TEST-DB02</DBInstance>
-                    <DBPort>1433</DBPort>
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
                 </DBAlias>
             </Database>
         </StateService>
@@ -232,32 +257,44 @@
                 <ReportingDB>WebAnalyticsReporting</ReportingDB>
                 <StagingDB>WebAnalyticsStaging</StagingDB>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
                 </DBAlias>
             </Database>
         </WebAnalyticsService>
-        <SPUsageService Provision="localhost">
+        <SPUsageService Provision="VERGE-DAPP01">
             <Name>Usage and Health Data Collection</Name>
             <Database>
                 <Name>UsageAndHealth</Name>
-                <DBServer>SPSQL</DBServer>
+                <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
-                    <DBInstance>VERGE-TEST-DB02</DBInstance>
-                    <DBPort>1433</DBPort>
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
                 </DBAlias>
             </Database>
         </SPUsageService>
-        <SecureStoreService Provision="localhost">
+        <SecureStoreService Provision="VERGE-DAPP01">
             <Name>Secure Store Service</Name>
             <ProxyName>Secure Store Service</ProxyName>
             <Database>
                 <Name>SecureStore</Name>
-                <DBServer>SPSQL</DBServer>
+                <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
-                    <DBInstance>VERGE-TEST-DB02</DBInstance>
-                    <DBPort>1433</DBPort>
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
                 </DBAlias>
             </Database>
         </SecureStoreService>
@@ -267,6 +304,10 @@
             <Database>
                 <Name>BusinessDataCatalog</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -279,6 +320,10 @@
             <Database>
                 <Name>WordAutomation</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -288,11 +333,16 @@
         <AppManagementService Provision="false">
             <Name>App Management Service</Name>
             <ProxyName>App Management Service</ProxyName>
-            <AppDomain>app</AppDomain>
+            <AppDomain>apps.sharepointoscar.com</AppDomain>
             <Database>
-                <Name>AppService</Name>
+                <Name>AppManagement</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
+                    <DBInstance></DBInstance>
                     <DBPort></DBPort>
                 </DBAlias>
             </Database>
@@ -303,13 +353,17 @@
             <Database>
                 <Name>SubscriptionSettings</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
-                    <DBInstance>VERGE-TEST-DB02</DBInstance>
-                    <DBPort>1433</DBPort>
+                    <DBInstance></DBInstance>
+                    <DBPort></DBPort>
                 </DBAlias>
             </Database>
         </SubscriptionSettingsService>
-        <WorkManagementService Provision="false">
+        <WorkManagementService Provision="SP2016APPSERVER">
             <Name>Work Management Service Application</Name>
             <ProxyName>Work Management Service Application</ProxyName>
         </WorkManagementService>
@@ -319,6 +373,10 @@
             <Database>
                 <Name>TranslationService</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -333,13 +391,13 @@
     <EnterpriseServiceApps>
         <ExcelServices Provision="false">
             <Name>Excel Services Application</Name>
-            <UnattendedIDUser>VMSAK_QA\srv_qa_shp_Excel</UnattendedIDUser>
-            <UnattendedIDPassword>frUGZvdjd7gk</UnattendedIDPassword>
+            <UnattendedIDUser>{{ netbios }}\SP_ExcelUser</UnattendedIDUser>
+            <UnattendedIDPassword></UnattendedIDPassword>
         </ExcelServices>
         <VisioService Provision="false">
             <Name>Visio Graphics Service</Name>
             <ProxyName>Visio Graphics Service</ProxyName>
-            <UnattendedIDUser>VMSAK_QA\SP_VisioUser</UnattendedIDUser>
+            <UnattendedIDUser>{{ netbios }}\SP_VisioUser</UnattendedIDUser>
             <UnattendedIDPassword></UnattendedIDPassword>
         </VisioService>
         <AccessService Provision="false">
@@ -352,6 +410,10 @@
             <Database>
                 <Name>AccessServices</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -361,11 +423,15 @@
         <PerformancePointService Provision="false">
             <Name>PerformancePoint Service</Name>
             <ProxyName>PerformancePoint Service</ProxyName>
-            <UnattendedIDUser>VMSAK_QA\SP_PerfPointUser</UnattendedIDUser>
+            <UnattendedIDUser>{{ netbios }}\SP_PerfPointUser</UnattendedIDUser>
             <UnattendedIDPassword></UnattendedIDPassword>
             <Database>
                 <Name>PerformancePoint</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
                     <DBInstance></DBInstance>
                     <DBPort></DBPort>
@@ -379,7 +445,7 @@
         <ExcelService Provision="false">
             <Name>Excel Web App</Name>
             <ProxyName>Excel Web App</ProxyName>
-            <UnattendedIDUser>CONTOSO\SP_ExcelUser</UnattendedIDUser>
+            <UnattendedIDUser>{{ netbios }}\SP_ExcelUser</UnattendedIDUser>
             <UnattendedIDPassword></UnattendedIDPassword>
         </ExcelService>
         <WordViewingService Provision="false">
@@ -392,16 +458,23 @@
         </PowerPointService>
     </OfficeWebApps>
     <ProjectServer Install="false">
+        <ConfigFile>config-ProjectServer2013.xml</ConfigFile>
         <PIDKeyProjectServer></PIDKeyProjectServer>
-        <ServiceApp Provision="false">
+        <ServiceApp Provision="localhost">
             <Name>Project Server Service Application</Name>
             <ProxyName>Project Server Service Application</ProxyName>
             <ManagedPath>PWA</ManagedPath>
+            <ServiceAccount>{{ netbios }}\SP_ProjectServer</ServiceAccount>
             <ServiceAccountPassword></ServiceAccountPassword>
             <Database>
                 <Name>ProjectServer</Name>
                 <DBServer></DBServer>
+                <SQLAuthentication UseFarmSetting="true">
+                    <SQLUserName></SQLUserName>
+                    <SQLPassword></SQLPassword>
+                </SQLAuthentication>
                 <DBAlias Create="false">
+                    <DBInstance></DBInstance>
                     <DBPort></DBPort>
                 </DBAlias>
             </Database>

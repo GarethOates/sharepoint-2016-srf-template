@@ -1,0 +1,22 @@
+- name: Disable User Access Control UAC
+  script: ../../common/files/disable-uac.bat
+
+- name: Setup DNS Server to point to DC
+  win_dns_client:
+    adapter_names: "Ethernet 2"
+    ipv4_addresses: "{{ dns_server }}"
+  tags:
+    - local-only
+
+- name: Join Server to Domain Controller
+  win_domain_membership:
+      dns_domain_name: "{{ domain }}"
+      hostname: "{{ cloud_host }}"
+      domain_admin_user: "{{ domain_admin_user }}"
+      domain_admin_password: "{{ domain_admin_password }}"
+      state: domain
+  register: domain_state
+
+- name: Reboot server after joining to Domain Server
+  win_reboot:
+  when: domain_state.reboot_required

@@ -31,13 +31,29 @@
 
 - name: Copy SP folder (SPAutoInstaller folder structure)
   win_copy:
-    src: 'SP/'
+    src: '../../common/files/SP/'
     dest: 'C:\SP'
     force: no
 
+- name: Download SP2016 Update November 2020
+  win_get_url:
+    url: http://techoverflow.com/sts2016-kb4486677-fullfile-x64-glb.exe
+    dest: 'C:\SP\2016\Updates\sts2016-kb4486677-fullfile-x64-glb.exe'
+
+- name: Download SP2016 Norwegian Language Pack
+  win_get_url:
+    url: http://techoverflow.com/nb-no.zip
+    dest: 'C:\SP\2016\LanguagePacks\nb-no.zip'
+
+- name: Unzip Language Pack
+  win_unzip:
+    src: C:\SP\2016\LanguagePacks\nb-no.zip
+    dest: C:\SP\2016\LanguagePacks
+    creates: C:\SP\2016\LanguagePacks\nb-no
+
 - name: Copy AutoSPInstallerInput.xml File
   win_template:
-    src: AutoSPInstallerInput.xml.j2
+    src: ../../common/templates/AutoSPInstallerInput.xml.j2
     dest: 'C:\SP\AutoSPInstaller\AutoSPInstallerInput.xml'
 
 - name: Copy SP Bits to SPAutoInstaller folder structure
@@ -118,10 +134,13 @@
 - name: Wait for 'Press any key' in log file
   win_wait_for:
     path: "{{logs.files[0].path}}"
-    regex: Press any key
+    regex: 'Press any key'
     state: present
     timeout: 2400
   failed_when: logs.matched == 0
 
 - name: Reboot server
   win_reboot:
+
+- name: Update AppFabric to Cu7
+  script: ../../common/files/appfabric.ps1

@@ -15,7 +15,7 @@ farm_password: "Pass@word1!"
 services_password: "Pass@word1!"
 portalapppool_password: "Pass@word1!"
 search_service_password: "Pass@word1!"
-search_content_password: "Pass@word1!"
+crawl_password: "Pass@word1!"
 
 ansible_user: vagrant
 ansible_password: vagrant

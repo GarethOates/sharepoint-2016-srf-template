@@ -62,8 +62,8 @@ resource "azurerm_network_interface" "spfarm-db1" {
     }
 }
 
-resource "azurerm_network_interface" "spfarm-sharepoint" {
-    name                      = "network-interface-spfarm-sharepoint"
+resource "azurerm_network_interface" "spfarm-sharepointweb" {
+    name                      = "network-interface-spfarm-sharepoint-web"
     location                  = azurerm_resource_group.sp2016rg.location
     resource_group_name       = azurerm_resource_group.sp2016rg.name
     dns_servers               = ["10.10.1.18", "1.1.1.1"]
@@ -73,6 +73,20 @@ resource "azurerm_network_interface" "spfarm-sharepoint" {
         subnet_id                               = azurerm_subnet.sharepointsubnet.id
         private_ip_address_allocation           = "Static"
         private_ip_address                      = "10.10.1.19"
+    }
+}
+
+resource "azurerm_network_interface" "spfarm-sharepointapp" {
+    name                      = "network-interface-spfarm-sharepoint-app"
+    location                  = azurerm_resource_group.sp2016rg.location
+    resource_group_name       = azurerm_resource_group.sp2016rg.name
+    dns_servers               = ["10.10.1.18", "1.1.1.1"]
+
+    ip_configuration {
+        name                                    = "sharepoint-ipconfiguration"
+        subnet_id                               = azurerm_subnet.sharepointsubnet.id
+        private_ip_address_allocation           = "Static"
+        private_ip_address                      = "10.10.1.20"
     }
 }
 
