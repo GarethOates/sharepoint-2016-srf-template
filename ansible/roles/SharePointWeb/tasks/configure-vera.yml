@@ -1,0 +1,31 @@
+- name: "Set Vera Site Binding to actual IP"
+  win_iis_webbinding:
+    name: Vera
+    host_header: "index.{{ domain }}"
+    port: 80
+    ip: "{{ ansible_facts.ip_addresses[0] }}"
+    state: present
+
+- name: "Remove Unassigned IP Binding"
+  win_iis_webbinding:
+    name: Vera
+    host_header: "index.{{ domain }}"
+    ip: "*"
+    port: 80
+    state: absent
+
+# - name: Extend WebApplication
+#   become: yes
+#   vars:
+#     - web_app_url: "index.{{ domain }}"
+#     - web_ext_url: "vera2.{{ domain }}"
+#   win_shell: |
+#       Add-PSSnapin Microsoft.SharePoint.PowerShell -EA 0
+#       Import-Module WebAdministration
+#       Get-SPWebApplication -Identity http://{{ web_app_url }} | New-SPWebApplicationExtension -name 'Vera Intranett' -URL http://{{ web_ext_url }} -HostHeader {{ web_ext_url}} -Zone Intranet -Port 80
+
+- name: Add new URL to hosts file
+  win_hosts:
+    state: present
+    canonical_name: "vera2.{{ domain }}"
+    ip_address: 127.0.0.1

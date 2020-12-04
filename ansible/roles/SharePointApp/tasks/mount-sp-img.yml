@@ -135,9 +135,8 @@
   win_wait_for:
     path: "{{logs.files[0].path}}"
     regex: 'Press any key'
-    state: present
-    timeout: 2400
-  failed_when: logs.matched == 0
+    timeout: 4800
+  when: logs.matched != 0
 
 - name: Reboot server
   win_reboot:

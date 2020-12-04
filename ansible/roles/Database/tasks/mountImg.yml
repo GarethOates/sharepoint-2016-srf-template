@@ -1,10 +1,13 @@
 - name: Disable User Access Control UAC
   script: ../../common/files/disable-uac.bat
 
-- name: Install DotNet Framework 4.6.1 
+- name: Install DotNet Framework 4.6.1 and SSMS
   win_chocolatey:
-    name: dotnet4.6.1
+    name: "{{ item }}"
     state: present
+  with_items:
+    - dotnet4.6.1
+    - sql-server-management-studio
 
 - name: Open port 1433 for remote connections to SQL Server
   win_firewall_rule:

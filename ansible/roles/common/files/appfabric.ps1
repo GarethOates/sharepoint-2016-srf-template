@@ -7,6 +7,8 @@
 #   Do not rename the AppFabric Cumulative Update!
 #-----------------------------------------------------------------------------
 #Check if PS Console is running as "elevated"
+Add-PSSnapin Microsoft.SharePoint.PowerShell
+
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs; exit }
 
 $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
